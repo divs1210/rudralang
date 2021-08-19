@@ -1,0 +1,16 @@
+ns!(fact, {} =>
+
+  defn!(fact, {}, [n] =>
+    cond(
+      n == 0 => 1,
+      :else  => n * fact(n - 1)
+    )
+  )
+
+  defn!(main!, {:public true}, args =>
+    do(
+      println!(fact(5)),
+      println!(fact("a"))
+    )
+  )
+)
