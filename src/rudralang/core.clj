@@ -1,5 +1,50 @@
 (ns rudralang.core
-  (:gen-class))
+  (:gen-class)
+  (:require [clojure.edn :as edn]
+            [clojure.java.io :as io]
+            [clojure.java.shell :refer [sh]]
+            [clojure.string :as str]
+            [rudralang.compiler :as compiler]
+            [rudralang.parser :as parser]))
+
+(defn compile-raw-string
+  [s]
+  (-> s parser/parse compiler/compile))
 
 (defn -main
-  [& args])
+  [& [filename]]
+  (let [{:keys [chez-exe-path]
+         :or {chez-exe-path "../chez-exe"}}
+        (edn/read-string (slurp "./config.edn"))
+
+        native-compile-cmd
+        (str chez-exe-path "/compile-chez-program")
+
+        raw-code (slurp filename)
+        filename-without-ext (first (str/split filename #"\."))
+        scheme-filename (str filename-without-ext ".scm")
+
+        prelude (slurp (io/resource "prelude.scm"))
+        postlude (slurp (io/resource "postlude.scm"))]
+    (println "writing" scheme-filename)
+    (spit scheme-filename
+          (str prelude
+               (compile-raw-string raw-code)
+               postlude))
+
+    (println "compiling with chez-exe")
+    (let [res (sh native-compile-cmd "--optimize-level" "3" scheme-filename)
+          out (:out res)
+          out (if (seq out)
+                out
+                (:err res))]
+      (println out))
+
+    (shutdown-agents)))
+
+(comment
+  (def code
+    (slurp "./samples/fact.rudra"))
+
+  (compile-raw-string code)
+  )

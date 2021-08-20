@@ -1,0 +1,14 @@
+ns!(fact,
+  {} =>
+
+  defn!(fact, {}, [n] =>
+    cond(
+      equal?(n, 0) => 1,
+      :else        => mul(n, fact(sub(n, 1)))
+    )
+  )
+
+  defn!(main!, {}, args =>
+    println!(fact(5))
+  )
+)

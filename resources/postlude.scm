@@ -1,0 +1,2 @@
+
+(apply main! (command-line))

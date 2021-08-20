@@ -8,4 +8,5 @@
                  [instaparse "1.4.10"]]
   :main ^:skip-aot rudralang.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}}
+  :aliases {"-compile" ["trampoline" "run" "-m" "rudralang.core"]})

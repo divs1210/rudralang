@@ -8,7 +8,7 @@ vector                 = <block_open> exp* <block_close>
 map                    = <curly_open> (exp exp)* <curly_close>
 form                   = (symbol | form) <lang_white_space>* <lparen> exp* <rparen>
 sym_start_char         = #"[a-zA-Z=_<>!&\+\*\-\$\?]"
-kw_or_sym_name_char    = #"[a-zA-Z0-9=_<>!&\+\*\-\$\?]"
+kw_or_sym_name_char    = #"[a-zA-Z0-9=_<>!&:\+\*\-\$\?\.]"
 anychar                = #"[\s\S]"
 <colon>                = <":">
 <double_quote>         = <"\"">
