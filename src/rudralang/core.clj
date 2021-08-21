@@ -13,8 +13,7 @@
 
 (defn -main
   [& [filename]]
-  (let [{:keys [chez-exe-path]
-         :or {chez-exe-path "../chez-exe"}}
+  (let [{:keys [chez-exe-path]}
         (edn/read-string (slurp "./config.edn"))
 
         native-compile-cmd
