@@ -1,0 +1,7 @@
+defn!(main!, {}, _ =>
+  let n := 5
+  println!("n = ", n)
+
+  let twice_n := (n * 2)
+  println!("twice_n = ", twice_n)
+)

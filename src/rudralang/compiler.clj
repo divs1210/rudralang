@@ -2,6 +2,26 @@
   (:refer-clojure :exclude [compile])
   (:require [clojure.core.match :refer [match]]))
 
+(declare compile)
+
+(defn compile-do
+  [exp]
+  (match exp
+   [:do]
+   '(begin)
+
+   [:do & [[:symbol 'let] k [:keyword :=] v & others]]
+   (list 'let (list (list (compile k) (compile v)))
+         (compile (vec (cons :do others))))
+
+   [:do e]
+   (compile e)
+
+   [:do & [e & others]]
+   (list 'begin
+         (compile e)
+         (compile (vec (cons :do others))))))
+
 (defn compile
   [exp]
   (match exp
@@ -31,10 +51,13 @@
    (cons 'list-map
          (partition-all 2 (map compile kvs)))
 
+   [:do & _]
+   (compile-do exp)
+
    [:fn & args]
    (let [[argv & body] args
          [argv-type & argv-args] argv
-         body (cons 'begin (map compile body))]
+         body (compile (vec (cons :do body)))]
      (case argv-type
        :symbol
        (list 'lambda (first argv-args) body)
@@ -87,7 +110,7 @@
             opts)))
 
        do
-       (cons 'begin (map compile args))
+       (recur (vec (cons :do args)))
 
        ;; default
        (cons op (map compile args))))))
