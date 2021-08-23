@@ -25,11 +25,13 @@
 
         prelude (slurp (io/resource "prelude.scm"))
         postlude (slurp (io/resource "postlude.scm"))]
-    (println "writing" scheme-filename)
-    (spit scheme-filename
-          (str prelude
-               (compile-raw-string raw-code)
-               postlude))
+    (let [_   (println "parsing" filename)
+          AST (parser/parse raw-code)]
+      (println "writing" scheme-filename)
+      (spit scheme-filename
+            (str prelude
+                 (compiler/compile AST)
+                 postlude)))
 
     (println "compiling with chez-exe")
     (let [res (sh native-compile-cmd "--optimize-level" "3" scheme-filename)
