@@ -8,12 +8,33 @@
 
 ;; ## Seq
 ;; ======
+(define first car)
+
+(define last cdr)
+
+(define nth list-ref)
+
 (define (every? xs pred)
   (if (null? xs)
       #t
       (if (pred (car xs))
           (every? (cdr xs) pred)
           #f)))
+
+(define (reduce f init coll)
+  (if (null? coll)
+      init
+      (reduce f
+              (f init (car coll))
+              (cdr coll))))
+
+(define (range start end)
+  (let loop ((res '())
+             (end (- end 1)))
+    (if (< end start)
+        res
+        (loop (cons end res)
+              (- end 1)))))
 
 ;; ## Errors
 ;; =========
@@ -132,6 +153,16 @@
   (apply print! args)
   (newline))
 
+;; ## Math
+;; =======
+(define add +)
+
+(define sub -)
+
+(define mul *)
+
+(define div /)
+
 
 ;; # Core
 ;; ======
@@ -174,15 +205,3 @@
 
 (define (rudra-set-def-opts! name x)
   (void))
-
-(define (add x y)
-  (+ x y))
-
-(define (sub x y)
-  (- x y))
-
-(define (mul x y)
-  (* x y))
-
-(define (div x y)
-  (/ x y))
