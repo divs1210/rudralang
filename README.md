@@ -17,12 +17,12 @@ ns!(fact,
   defn!(fact, {}, [n] =>
     cond(
       equal?(n, 0) => 1,
-      :else        => mul(n, fact(sub(n, 1)))
+      :else        => (n * fact((n - 1)))
     )
   )
 
-  defn!(main!, {}, args =>
-    println!(fact(5))
+  defn!(main!, {}, [_, n] =>
+    println!(fact(string->number(n)))
   )
 )
 ```

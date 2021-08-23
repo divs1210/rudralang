@@ -163,6 +163,10 @@
 
 (define div /)
 
+(define pow expt)
+
+(define ** pow)
+
 
 ;; # Core
 ;; ======

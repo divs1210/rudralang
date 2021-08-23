@@ -1,4 +1,4 @@
-exp                    = <lang_white_space>* (boolean | number | keyword | symbol | string | vector | map | form) <lang_white_space>*
+exp                    = <lang_white_space>* (boolean | number | keyword | symbol | string | vector | map | form | infix_operation) <lang_white_space>*
 boolean                = "true" | "false"
 number                 = #"[+-]?([0-9]+([.][0-9]*)?)"
 keyword                = <colon> kw_or_sym_name_char+
@@ -6,10 +6,12 @@ symbol                 = !"=>" (sym_start_char kw_or_sym_name_char*)
 string                 = <double_quote> anychar_but_dbl_quote* <double_quote>
 vector                 = <block_open> exp* <block_close>
 map                    = <curly_open> (exp exp)* <curly_close>
+infix_operation        = <lparen> <lang_white_space>* exp <lang_white_space>* infix_operator <lang_white_space>* exp <lang_white_space>* <rparen>
 form                   = (symbol | form) <lang_white_space>* <lparen> exp* <rparen>
 sym_start_char         = #"[a-zA-Z=_<>!&\+\*\-\$\?]"
 kw_or_sym_name_char    = #"[a-zA-Z0-9=_<>!&:\+\*\-\$\?\.]"
 anychar_but_dbl_quote  = !"\"" #"[\s\S]"
+infix_operator         = #"[\+\*\-\\]" | "**"
 <colon>                = <":">
 <double_quote>         = <"\"">
 <block_open>           = <"[">
