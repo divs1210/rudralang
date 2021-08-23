@@ -8,7 +8,7 @@ ns!(fact,
     )
   )
 
-  defn!(main!, {}, args =>
-    println!(fact(5))
+  defn!(main!, {}, [name, n] =>
+    println!(fact(string->number(n)))
   )
 )
