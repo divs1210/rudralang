@@ -71,6 +71,9 @@
                  opts
                  (vec (list* :fn argv body))]))
 
+       fn
+       (recur (vec (cons :fn args)))
+
        cond
        (cons
         'cond
