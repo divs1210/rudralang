@@ -76,7 +76,7 @@ $ lein -compile samples/fact.rudra
 ### Run it
 
 ```
-$ sample/fact
+$ target/fact 5
 ```
 
 ## License
