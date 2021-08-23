@@ -7,26 +7,33 @@
             [rudralang.compiler :as compiler]
             [rudralang.parser :as parser]))
 
-(defn compile-raw-string
-  [s]
-  (-> s parser/parse compiler/compile))
-
 (defn -main
-  [& [filename]]
-  (let [{:keys [chez-exe-path]}
+  [& [filepath]]
+  (let [{:keys [chez-exe-path target-path]}
         (edn/read-string (slurp "./config.edn"))
 
-        native-compile-cmd
-        (str chez-exe-path "/compile-chez-program")
+        source-path (->> (str/split filepath #"/")
+                         butlast
+                         (str/join "/"))
 
-        raw-code (slurp filename)
-        filename-without-ext (first (str/split filename #"\."))
-        scheme-filename (str filename-without-ext ".scm")
+        target-path (if (= :same-as-source target-path)
+                      source-path
+                      target-path)
+
+        native-compile-cmd (str chez-exe-path "/compile-chez-program")
+
+        filename-without-ext (-> filepath
+                                 (str/split #"/")
+                                 last
+                                 (str/split #"\.")
+                                 first)
+
+        scheme-filename (str target-path "/" filename-without-ext ".scm")
 
         prelude (slurp (io/resource "prelude.scm"))
         postlude (slurp (io/resource "postlude.scm"))]
-    (let [_   (println "parsing" filename)
-          AST (parser/parse raw-code)]
+    (println "parsing" filepath)
+    (let [AST (parser/parse (slurp filepath))]
       (println "writing" scheme-filename)
       (spit scheme-filename
             (str prelude
@@ -43,9 +50,3 @@
 
     (shutdown-agents)))
 
-(comment
-  (def code
-    (slurp "./samples/fact.rudra"))
-
-  (compile-raw-string code)
-  )

@@ -1,1 +1,4 @@
-{:chez-exe-path "../chez-exe"}
+{
+ :chez-exe-path "../chez-exe"
+ :target-path "./target" ;; can also be set to :same-as-source
+ }
