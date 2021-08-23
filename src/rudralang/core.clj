@@ -49,4 +49,3 @@
       (println out))
 
     (shutdown-agents)))
-
