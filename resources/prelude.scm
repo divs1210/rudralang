@@ -6,6 +6,32 @@
 ;; # Internal
 ;; ==========
 
+;; ## Errors
+;; =========
+(define (raise! ex-str)
+  (raise
+   (condition
+    (make-error)
+    (make-message-condition ex-str))))
+
+;; ## Symbols and Keywords
+;; =======================
+(define (string->keyword s)
+  (string->symbol (string-append ":" s)))
+
+(define (symbol->keyword s)
+  (string->keyword (symbol->string s)))
+
+(define (keyword s)
+  (cond
+   ((symbol? s)
+    (symbol->keyword s))
+
+   ((string? s)
+    (string->keyword s))
+
+   (else (raise! "non string/symbol passed to keyword"))))
+
 ;; ## Seq
 ;; ======
 (define first car)
@@ -35,14 +61,6 @@
         res
         (loop (cons end res)
               (- end 1)))))
-
-;; ## Errors
-;; =========
-(define (raise! ex-str)
-  (raise
-   (condition
-    (make-error)
-    (make-message-condition ex-str))))
 
 ;; ## Maps
 ;; =======
