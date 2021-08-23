@@ -3,6 +3,7 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
+            [clojure.pprint :as pprint]
             [clojure.string :as str]
             [rudralang.compiler :as compiler]
             [rudralang.parser :as parser]))
@@ -33,11 +34,15 @@
         prelude (slurp (io/resource "prelude.scm"))
         postlude (slurp (io/resource "postlude.scm"))]
     (println "parsing" filepath)
-    (let [AST (parser/parse (slurp filepath))]
+    (let [AST (parser/parse (slurp filepath))
+          _ (println "compiling to Scheme")
+          scheme-code (compiler/compile AST)]
       (println "writing" scheme-filename)
       (spit scheme-filename
             (str prelude
-                 (compiler/compile AST)
+                 "\n"
+                 (with-out-str (pprint/pprint scheme-code))
+                 "\n"
                  postlude)))
 
     (println "compiling with chez-exe")
