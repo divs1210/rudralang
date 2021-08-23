@@ -2,14 +2,14 @@ exp                    = <lang_white_space>* (boolean | number | keyword | symbo
 boolean                = "true" | "false"
 number                 = #"[+-]?([0-9]+([.][0-9]*)?)"
 keyword                = <colon> kw_or_sym_name_char+
-symbol                 = !'=>' (sym_start_char kw_or_sym_name_char*)
-string                 = <double_quote> anychar* <double_quote>
+symbol                 = !"=>" (sym_start_char kw_or_sym_name_char*)
+string                 = <double_quote> anychar_but_dbl_quote* <double_quote>
 vector                 = <block_open> exp* <block_close>
 map                    = <curly_open> (exp exp)* <curly_close>
 form                   = (symbol | form) <lang_white_space>* <lparen> exp* <rparen>
 sym_start_char         = #"[a-zA-Z=_<>!&\+\*\-\$\?]"
 kw_or_sym_name_char    = #"[a-zA-Z0-9=_<>!&:\+\*\-\$\?\.]"
-anychar                = #"[\s\S]"
+anychar_but_dbl_quote  = !"\"" #"[\s\S]"
 <colon>                = <":">
 <double_quote>         = <"\"">
 <block_open>           = <"[">
