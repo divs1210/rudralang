@@ -1,7 +1,8 @@
 (ns rudralang.parser
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
-            [instaparse.core :as insta]))
+            [instaparse.core :as insta]
+            [rudralang.util :as u]))
 
 (def parse*
   (insta/parser
@@ -36,5 +37,13 @@
 
 (defn parse
   [text]
-  (->> (parse* text)
-       (insta/transform transform-options)))
+  (let [parsed (insta/transform transform-options
+                                (parse* text))]
+    (if (map? parsed)
+      (let [{:keys [line column text]} parsed
+            pointer (str/join (concat (repeat (dec column) " ") ["^"]))]
+        (u/throw+ "Parsing error at line: " line
+                  ", column: " column
+                  " in text:\n" text
+                  "\n" pointer))
+      parsed)))
