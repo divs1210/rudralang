@@ -14,6 +14,15 @@
     (make-error)
     (make-message-condition ex-str))))
 
+;; ## Boolean
+;; ==========
+(define (falsey? x)
+  (or (not x)
+      (null? x)))
+
+(define (truthy? x)
+  (not (falsey? x)))
+
 ;; ## Symbols and Keywords
 ;; =======================
 (define (string->keyword s)
