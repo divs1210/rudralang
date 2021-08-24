@@ -6,6 +6,11 @@
 ;; # Internal
 ;; ==========
 
+;; ## Constants
+;; ============
+(define null
+  '())
+
 ;; ## Errors
 ;; =========
 (define (raise! ex-str)
