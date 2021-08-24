@@ -1,6 +1,7 @@
 (ns rudralang.compiler
   (:refer-clojure :exclude [compile])
-  (:require [clojure.core.match :refer [match]]))
+  (:require [clojure.core.match :refer [match]]
+            [rudralang.util :as u]))
 
 (declare compile)
 
@@ -25,6 +26,10 @@
                                     lhs-syms))))]
      (list 'let* bindings
            (compile (vec (cons :do others)))))
+
+   [:do & [[:symbol 'let] & others]]
+   (u/throw+ "Syntax error - let should be of the form:\n"
+             "  let name := value")
 
    [:do e]
    (compile e)
