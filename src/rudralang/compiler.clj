@@ -23,7 +23,16 @@
                        (list rhs-name (compile rhs))
                        (map-indexed (fn [idx k]
                                       (list (compile k) (list 'nth rhs-name idx)))
-                                    lhs-syms))))]
+                                    lhs-syms)))
+
+                    :map
+                    (let [rhs-name (gensym)]
+                      (list*
+                       (list rhs-name (compile rhs))
+                       (map (fn [k]
+                              (let [k-sym (compile k)]
+                                (list k-sym (list 'get rhs-name (symbol (str "':" k-sym))))))
+                            lhs-syms))))]
      (list 'let* bindings
            (compile (vec (cons :do others)))))
 
