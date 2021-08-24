@@ -1,0 +1,8 @@
+defn!(main!, {}, _ =>
+  let v := list(1, list(2), {:third 3}, list({:fourth 4}))
+  let f := fn([[first, [second], {third}, [{fourth}]]] =>
+    list(first, second, third, fourth)
+  )
+
+  println!("destructuring fn: " f(v))
+)
