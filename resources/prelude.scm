@@ -45,7 +45,7 @@
 ;; ======
 (define first car)
 
-(define last cdr)
+(define rest cdr)
 
 (define nth list-ref)
 
