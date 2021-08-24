@@ -21,11 +21,8 @@
        str/join))
 
 (defn transform-infix-operation
-  [x-node [_ op] y-node]
-  [:form
-   [:symbol (symbol op)]
-   x-node
-   y-node])
+  [x-node op y-node]
+  [:form op x-node y-node])
 
 (def transform-options
   {:exp     identity
