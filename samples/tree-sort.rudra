@@ -1,0 +1,55 @@
+ns!(tree-sort,
+  {} =>
+
+  defn!(place, {}, [tree, x] =>
+    cond(
+      null?(tree) =>
+        {:val x
+         :ltree {}
+         :rtree {}}
+      (x < get(tree, :val)) =>
+        place(get(tree, :ltree), x)
+      :else =>
+        place(get(tree, :rtree), x)
+    )
+  )
+
+  defn!(make-tree, {}, [nums] =>
+    loop([tree := {},
+          remaining := nums] =>
+      cond(
+        null?(remaining) =>
+          tree
+        :else =>
+          recur(
+            place(tree, first(nums)),
+            rest(nums)
+          )
+      )
+    )
+  )
+
+  defn!(walk, {}, [tree] =>
+    cond(
+      null?(tree) =>
+        '()
+      :else =>
+        append(
+          walk(get(tree, :ltree)),
+          list(get(tree, :val)),
+          walk(get(tree, :rtree))
+        )
+    )
+  )
+
+  defn!(tree-sort, {}, [nums] =>
+    walk(make-tree(nums))
+  )
+
+  defn!(main!, {}, args =>
+    let strs := rest(args)
+    let nums := map(string->number, strs)
+
+    println!(tree-sort(nums))
+  )
+)
