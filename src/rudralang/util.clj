@@ -4,3 +4,7 @@
 (defn throw+
   [& msgs]
   (throw (Exception. (str/join msgs))))
+
+(defn concatv
+  [& colls]
+  (vec (apply concat colls)))

@@ -5,6 +5,36 @@
 
 (declare compile)
 
+(defn destructuring-bind
+  [[lhs-type & lhs-ks] rhs]
+  (case lhs-type
+    :symbol
+    (list (list (first lhs-ks) (compile rhs)))
+
+    :vector
+    (let [rhs-name (gensym)]
+      (list*
+       (list rhs-name (compile rhs))
+       (apply
+        concat
+        (map-indexed (fn [idx k]
+                       (destructuring-bind
+                        k
+                        [:form
+                         [:symbol 'nth]
+                         [:symbol rhs-name]
+                         [:number idx]]))
+                     lhs-ks))))
+
+    :map
+    (let [rhs-name (gensym)]
+      (list*
+       (list rhs-name (compile rhs))
+       (map (fn [k]
+              (let [k-sym (compile k)]
+                (list k-sym (list 'get rhs-name (symbol (str "':" k-sym))))))
+            lhs-ks)))))
+
 (defn compile-do
   [exp]
   (match exp
@@ -12,29 +42,8 @@
    '(begin)
 
    [:do & [[:symbol 'let] lhs [:keyword :=] rhs & others]]
-   (let [[lhs-type & lhs-syms] lhs
-         bindings (case lhs-type
-                    :symbol
-                    (list (list (first lhs-syms) (compile rhs)))
-
-                    :vector
-                    (let [rhs-name (gensym)]
-                      (list*
-                       (list rhs-name (compile rhs))
-                       (map-indexed (fn [idx k]
-                                      (list (compile k) (list 'nth rhs-name idx)))
-                                    lhs-syms)))
-
-                    :map
-                    (let [rhs-name (gensym)]
-                      (list*
-                       (list rhs-name (compile rhs))
-                       (map (fn [k]
-                              (let [k-sym (compile k)]
-                                (list k-sym (list 'get rhs-name (symbol (str "':" k-sym))))))
-                            lhs-syms))))]
-     (list 'let* bindings
-           (compile (vec (cons :do others)))))
+   (list 'let* (destructuring-bind lhs rhs)
+         (compile (vec (cons :do others))))
 
    [:do & [[:symbol 'let] & others]]
    (u/throw+ "Syntax error - let should be of the form:\n"
@@ -47,6 +56,27 @@
    (list 'begin
          (compile e)
          (compile (vec (cons :do others))))))
+
+(defn compile-fn
+  [[_ & args]]
+  (let [[argv & body] args
+        [argv-type & argv-args] argv]
+    (case argv-type
+      :symbol
+      (list 'lambda (first argv-args)
+            (compile (vec (cons :do body))))
+
+      :vector
+      (let [argv-name (gensym)]
+        (list 'lambda argv-name
+              (compile
+               (u/concatv
+                [:do
+                 [:symbol 'let]
+                 (vec (cons :vector argv-args))
+                 [:keyword :=]
+                 [:symbol argv-name]]
+                body)))))))
 
 (defn compile
   [exp]
@@ -80,16 +110,8 @@
    [:do & _]
    (compile-do exp)
 
-   [:fn & args]
-   (let [[argv & body] args
-         [argv-type & argv-args] argv
-         body (compile (vec (cons :do body)))]
-     (case argv-type
-       :symbol
-       (list 'lambda (first argv-args) body)
-
-       :vector
-       (list 'lambda (map compile argv-args) body)))
+   [:fn & _]
+   (compile-fn exp)
 
    [:form op & args]
    (let [op (compile op)]
