@@ -40,8 +40,6 @@ This repo contains a compiler written in Clojure.
 
 It compiles Rudra source to Chez Scheme, and then to a native binary via [chez-exe](https://github.com/gwatt/chez-exe).
 
-The current parser has unpredictable performance. It will be replaced in the future.
-
 ## Installation
 
 ### Install Leiningen

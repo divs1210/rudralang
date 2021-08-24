@@ -18,6 +18,6 @@ infix_operator         = #"[\+\*\-\\]" | "**"
 <block_close>          = <"]">
 <curly_open>           = <"{">
 <curly_close>          = <"}">
-<lang_white_space>     = <#"[\s,]|=>">
+<lang_white_space>     = (<#"\s*"> | <"=>"> | <",">)*
 <lparen>               = <"(">
 <rparen>               = <")">
