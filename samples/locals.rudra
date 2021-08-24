@@ -1,7 +1,7 @@
 defn!(main!, {}, _ =>
-  let n := 5
-  println!("n = ", n)
+  let [m, n] := list(1, 2)
+  println!("m, n = " m ", " n)
 
   let twice := fn([x] => (x * 2))
-  println!("twice(n) = ", twice(n))
+  println!("twice(n) = " twice(n))
 )

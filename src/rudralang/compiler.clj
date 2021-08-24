@@ -10,9 +10,21 @@
    [:do]
    '(begin)
 
-   [:do & [[:symbol 'let] k [:keyword :=] v & others]]
-   (list 'let (list (list (compile k) (compile v)))
-         (compile (vec (cons :do others))))
+   [:do & [[:symbol 'let] lhs [:keyword :=] rhs & others]]
+   (let [[lhs-type & lhs-syms] lhs
+         bindings (case lhs-type
+                    :symbol
+                    (list (list (first lhs-syms) (compile rhs)))
+
+                    :vector
+                    (let [rhs-name (gensym)]
+                      (list*
+                       (list rhs-name (compile rhs))
+                       (map-indexed (fn [idx k]
+                                      (list (compile k) (list 'nth rhs-name idx)))
+                                    lhs-syms))))]
+     (list 'let* bindings
+           (compile (vec (cons :do others)))))
 
    [:do e]
    (compile e)
