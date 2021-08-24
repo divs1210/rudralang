@@ -145,6 +145,14 @@
        fn
        (recur (vec (cons :fn args)))
 
+       loop
+       (let [[[_ & bindings] & body] args]
+         (list
+          'let 'recur (mapcat (fn [[lhs _ rhs]]
+                                (destructuring-bind lhs rhs))
+                              (partition-all 3 bindings))
+          (compile (vec (cons :do body)))))
+
        cond
        (cons
         'cond
