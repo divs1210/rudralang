@@ -1,14 +1,12 @@
-# WIP
+# !!EXPERIMENTAL!!
 
 # rudralang
 
-A general purpose functional programming language with familiar syntax.
+A fast general-purpose high-level functional-programming language with familiar syntax.
 
-Inspired from Clojure, Elixir.
+## Code Example
 
-Compiles to [Chez Scheme](https://github.com/cisco/ChezScheme) and to native via [chez-exe](https://github.com/gwatt/chez-exe).
-
-Example factorial program:
+[Example factorial program](samples/fact.rudra):
 
 ```
 ns!(fact,
@@ -26,6 +24,23 @@ ns!(fact,
   )
 )
 ```
+
+## Goals
+
+- **Extensible** top-level functions polymorphic by default
+- **Recursion-friendly** many algorithms are simpler when defined recursively - they should be written as such
+- **Concurrency-friendly** using Clojure-like [`atom`s](https://clojuredocs.org/clojure.core/atom)
+- **Full numeric tower** no integer overflows, `(-1 ** 0.5)` is `0+i`
+- **Ergonomic** familiar syntax, destructuring everywhere
+- **Immutable data structures** by default
+
+## Notes on this implementation
+
+This repo contains a compiler written in Clojure.
+
+It compiles Rudra source to Chez Scheme, and then to a native binary via [chez-exe](https://github.com/gwatt/chez-exe).
+
+The current parser has unpredictable performance. It will be replaced in the future.
 
 ## Installation
 
