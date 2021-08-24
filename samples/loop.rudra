@@ -1,0 +1,13 @@
+defn!(main!, {}, [_, n] =>
+  loop([n := string->number(n)] =>
+    cond(
+      zero?(n) =>
+        null
+      :else =>
+        do(
+          println!(n)
+          recur((n - 1))
+        )
+    )
+  )
+)
