@@ -2,7 +2,7 @@
 
 # rudralang
 
-A fast general-purpose high-level functional-programming language with familiar syntax.
+A dynamic general-purpose high-level functional-programming language with familiar syntax.
 
 ## Code Example
 
@@ -27,10 +27,10 @@ ns!(fact,
 
 ## Goals
 
-- **Extensible** top-level functions polymorphic by default
+- **Extensible** top-level functions are polymorphic by default
 - **Recursion-friendly** many algorithms are simpler when defined recursively - they should be written as such
-- **Concurrency-friendly** using Clojure-like [`atom`s](https://clojuredocs.org/clojure.core/atom)
-- **Full numeric tower** no integer overflows, `(-1 ** 0.5)` is `0+i`
+- **Concurrency-friendly** mutability using Clojure-like [`atom`s](https://clojuredocs.org/clojure.core/atom)
+- **Full numeric tower** example: no integer overflows, `pow(-1, 0.5)` is `0+i`
 - **Ergonomic** familiar syntax, destructuring everywhere
 - **Immutable data structures** by default
 
