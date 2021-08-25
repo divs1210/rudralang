@@ -13,7 +13,7 @@ ns!(fizzbuzz,
   defn!(main!, {}, [_, n] =>
     for-each(
       fn([x] => println!(fizzbuzz(x))),
-      range(1, add(1, string->number(n)))
+      range(1, (1 + string->number(n)))
     )
   )
 )

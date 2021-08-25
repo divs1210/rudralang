@@ -27,8 +27,8 @@
 (def transform-options
   {:exp     identity
    :number  (tag :number read-string)
-   :keyword (tag :keyword (comp keyword transform-string))
-   :symbol  (tag :symbol  (comp symbol transform-string))
+   :keyword (tag :keyword keyword)
+   :symbol  (tag :symbol symbol)
    :string  (tag :string transform-string)
    :infix_operation transform-infix-operation})
 
