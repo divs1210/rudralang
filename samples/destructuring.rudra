@@ -2,7 +2,7 @@ defn!(main!, {}, _ =>
   let v := [1, [2], {:third 3}, [{:fourth 4}]]
 
   let [first, [second], {third}, [{fourth}]] := v
-  println!("destructuring let: " list(first, second, third, fourth))
+  println!("destructuring let: " [first, second, third, fourth])
 
   let f := fn([[first, [second], {third}, [{fourth}]]] =>
     [first, second, third, fourth]

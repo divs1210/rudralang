@@ -1,5 +1,5 @@
 defn!(main!, {}, _ =>
-  let [m, n] := list(1, 2)
+  let [m, n] := [1, 2]
   println!("m, n = " m ", " n)
 
   let twice := fn([x] => (x * 2))
