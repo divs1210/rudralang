@@ -46,6 +46,19 @@
 
    (else (raise! "non string/symbol passed to keyword"))))
 
+(define (keyword? k)
+  (and
+   (symbol? k)
+   (equal? #\: (string-ref (symbol->string k) 0))))
+
+(define (name sym-or-kw)
+  (if (symbol? sym-or-kw)
+      (let ((str (symbol->string sym-or-kw)))
+        (if (equal? #\: (string-ref str 0))
+            (list->string (rest (string->list str)))
+            str))
+      (raise! "non symbol/keyword passed to name")))
+
 ;; ## Seq
 ;; ======
 (define first car)
@@ -53,6 +66,17 @@
 (define rest cdr)
 
 (define nth list-ref)
+
+(define (take n xs)
+  (if (> n 0)
+      (append (list (first xs))
+              (take (- n 1) (rest xs)))
+      null))
+
+(define (drop n xs)
+  (if (> n 0)
+      (drop (- n 1) (rest xs))
+      xs))
 
 (define (every? xs pred)
   (if (null? xs)
