@@ -8,22 +8,22 @@ ns!(tree-sort,
          :ltree {}
          :rtree {}}
       (x < get(tree, :val)) =>
-        place(get(tree, :ltree), x)
+        assoc(tree, :ltree, place(get(tree, :ltree), x))
       :else =>
-        place(get(tree, :rtree), x)
+        assoc(tree, :rtree, place(get(tree, :rtree), x))
     )
   )
 
   defn!(make-tree, {}, [nums] =>
-    loop([tree := {},
+    loop([tree := {}
           remaining := nums] =>
       cond(
         null?(remaining) =>
           tree
         :else =>
           recur(
-            place(tree, first(nums)),
-            rest(nums)
+            place(tree, first(remaining)),
+            rest(remaining)
           )
       )
     )
@@ -32,7 +32,7 @@ ns!(tree-sort,
   defn!(walk, {}, [tree] =>
     cond(
       null?(tree) =>
-        '()
+        null
       :else =>
         append(
           walk(get(tree, :ltree)),
