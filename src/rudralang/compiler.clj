@@ -78,6 +78,28 @@
                  [:symbol argv-name]]
                 body)))))))
 
+(defn compile-loop
+  [args]
+  (let [[[_ & binding-nodes] & body] args
+        bindings-list-name (gensym)
+        binding-nodes (partition-all 3 binding-nodes)]
+    (list
+     'let 'recur (list
+                  (list bindings-list-name
+                        (compile
+                         (u/concatv
+                          [:form
+                           [:symbol 'list]]
+                          (for [[_ _ rhs-node] binding-nodes]
+                            rhs-node)))))
+     (list 'let* (destructuring-bind
+                  (u/concatv
+                   [:vector]
+                   (for [[lhs-node _ _] binding-nodes]
+                     lhs-node))
+                  [:symbol bindings-list-name])
+           (compile (vec (cons :do body)))))))
+
 (defn compile
   [exp]
   (match exp
@@ -146,12 +168,14 @@
        (recur (vec (cons :fn args)))
 
        loop
-       (let [[[_ & bindings] & body] args]
-         (list
-          'let 'recur (mapcat (fn [[lhs _ rhs]]
-                                (destructuring-bind lhs rhs))
-                              (partition-all 3 bindings))
-          (compile (vec (cons :do body)))))
+       (compile-loop args)
+
+       recur
+       (list 'recur
+             (compile (u/concatv
+                       [:form
+                        [:symbol 'list]]
+                       args)))
 
        cond
        (cons
