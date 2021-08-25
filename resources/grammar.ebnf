@@ -11,12 +11,14 @@ form                   = (symbol | form) <lang_white_space> <lparen> exp* <rpare
 sym_start_char         = #"[a-zA-Z=_<>!&\+\*\-\$\?]"
 kw_or_sym_name_char    = #"[a-zA-Z0-9=_<>!&:\+\*\-\$\?\.]"
 anychar_but_dbl_quote  = !"\"" #"[\s\S]"
+comment                = "<*" inside-comment* "*>"
+inside-comment         = !( "*>" | "<*" ) #"." | comment
 <colon>                = <":">
 <double_quote>         = <"\"">
 <block_open>           = <"[">
 <block_close>          = <"]">
 <curly_open>           = <"{">
 <curly_close>          = <"}">
-<lang_white_space>     = (<#"\s*"> | <"=>"> | <",">)*
+<lang_white_space>     = (<#"\s*"> | <"=>"> | <","> | comment)*
 <lparen>               = <"(">
 <rparen>               = <")">
