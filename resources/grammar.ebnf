@@ -1,10 +1,10 @@
-exp                    = <lang_white_space> (boolean | number | keyword | symbol | string | vector | map | form | infix_operation) <lang_white_space>
+exp                    = <lang_white_space> (boolean | number | keyword | symbol | string | list | map | form | infix_operation) <lang_white_space>
 boolean                = "true" | "false"
 number                 = #"[+-]?([0-9]+([.][0-9]*)?)"
 keyword                = <colon> #"[a-zA-Z0-9=_<>!&:\+\*\-\$\?\.]+"
 symbol                 = !"=>" #"[a-zA-Z=_<>!&\+\*\-\$\?][a-zA-Z0-9=_<>!&:\+\*\-\$\?\.]*"
 string                 = <double_quote> anychar_but_dbl_quote* <double_quote>
-vector                 = <block_open> exp* <block_close>
+list                   = <block_open> exp* <block_close>
 map                    = <curly_open> exp* <curly_close>
 infix_operation        = <lparen> <lang_white_space> exp <lang_white_space> symbol <lang_white_space> exp <lang_white_space> <rparen>
 form                   = (symbol | form) <lang_white_space> <lparen> exp* <rparen>

@@ -11,7 +11,7 @@
     :symbol
     (list (list (first lhs-ks) (compile rhs)))
 
-    :vector
+    :list
     (let [rhs-name (gensym)]
       (list*
        (list rhs-name (compile rhs))
@@ -66,14 +66,14 @@
       (list 'lambda (first argv-args)
             (compile (vec (cons :do body))))
 
-      :vector
+      :list
       (let [argv-name (gensym)]
         (list 'lambda argv-name
               (compile
                (u/concatv
                 [:do
                  [:symbol 'let]
-                 (vec (cons :vector argv-args))
+                 (vec (cons :list argv-args))
                  [:keyword :=]
                  [:symbol argv-name]]
                 body)))))))
@@ -94,7 +94,7 @@
                             rhs-node)))))
      (list 'let* (destructuring-bind
                   (u/concatv
-                   [:vector]
+                   [:list]
                    (for [[lhs-node _ _] binding-nodes]
                      lhs-node))
                   [:symbol bindings-list-name])
@@ -121,8 +121,8 @@
    [:string s]
    s
 
-   [:vector & xs]
-   (cons 'vector
+   [:list & xs]
+   (cons 'list
          (map compile xs))
 
    [:map & kvs]
