@@ -8,9 +8,9 @@ ns!(tree-sort,
          :ltree {}
          :rtree {}}
       (x < get(tree, :val)) =>
-        assoc(tree, :ltree, place(get(tree, :ltree), x))
+        update(tree, :ltree, place, x)
       :else =>
-        assoc(tree, :rtree, place(get(tree, :rtree), x))
+        update(tree, :rtree, place, x)
     )
   )
 

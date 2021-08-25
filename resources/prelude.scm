@@ -121,6 +121,12 @@
                              ks
                              v)))))
 
+(define (update-in m ks f . args)
+  (assoc-in m ks (apply f (get-in m ks) args)))
+
+(define (update m k f . args)
+  (apply update-in m (list k) f args))
+
 (define (dissoc m k)
   (let loop ((new-m '())
              (remaining-pairs m))
