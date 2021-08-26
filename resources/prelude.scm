@@ -92,13 +92,12 @@
               (f init (car coll))
               (cdr coll))))
 
-(define (range start end)
-  (let loop ((res '())
-             (end (- end 1)))
-    (if (< end start)
-        res
-        (loop (cons end res)
-              (- end 1)))))
+(define (range start end step)
+  (let ((compare (if (positive? step) < >))
+        (update  (lambda (x) (+ x step))))
+    (if (compare start end)
+        (cons start (range (update start) end step))
+        null)))
 
 ;; ## Maps
 ;; =======
