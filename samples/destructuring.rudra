@@ -9,6 +9,6 @@ defn!(main!, {}, _ =>
   println!("destructuring map: " [a, b, c, m])
 
   <* also works in fn params *>
-  let f := fn([[first, [second], {third}]] => [first, second, third])
-  println!("destructuring fn params: " f(coll))
+  let f := fn([first, [second], {third}] => [first, second, third])
+  println!("destructuring fn params: " f(1, [2], {:third 3}))
 )
