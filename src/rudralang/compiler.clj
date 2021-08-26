@@ -12,7 +12,13 @@
     (list (list (first lhs-ks) (compile rhs)))
 
     :list
-    (let [rhs-name (gensym)]
+    (let [rhs-name-node (u/after lhs-ks [:keyword :as] ::not-found)
+          rhs-name (if (= ::not-found rhs-name-node)
+                     (gensym)
+                     (last rhs-name-node))
+          lhs-ks   (if (= ::not-found rhs-name-node)
+                     lhs-ks
+                     (take-while #(not= % [:keyword :as]) lhs-ks))]
       (list*
        (list rhs-name (compile rhs))
        (apply
