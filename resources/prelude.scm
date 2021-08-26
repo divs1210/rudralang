@@ -1,10 +1,35 @@
 (import (rename (scheme)
                 (assoc scheme-assoc)
                 (merge scheme-merge)
-                (div   scheme-div)))
+                (div   scheme-div)
+                (equal? scheme=)))
 
-;; # Internal
+;; ## Internal
 ;; ==========
+(define (type x)
+  (cond
+   ((boolean? x)
+    'boolean)
+   ((number? x)
+    'number)
+   ((char? x)
+    'char)
+   ((symbol? x)
+    'symbol)
+   ((string? x)
+    'string)
+   ((fn? x)
+    'fn)
+   ((box? x)
+    'box)
+   ((map? x)
+    'map)
+   ((list? x)
+    'list)
+   ((pair? x)
+    'pair)
+   (else
+    'unknown)))
 
 ;; ## Constants
 ;; ============
@@ -27,6 +52,48 @@
 
 (define (truthy? x)
   (not (falsey? x)))
+
+(define (same? x y)
+  (eq? x y))
+
+(define (equal? x y)
+  (let ((t (type x)))
+    (if (not (scheme= t (type y)))
+        #f
+        (case t
+          ((fn box)
+           (same? x y))
+          (map
+           (and
+            (scheme= (length x) (length y))
+            (every? (lambda (pair)
+                      (let ((k (car pair))
+                            (v (cdr pair)))
+                        (and
+                         (contains? y k)
+                         (equal? v (get y k))
+                         #t)))
+                    x)))
+          (list
+           (let loop ((xs x)
+                      (ys y))
+             (cond
+              ((and (null? xs) (null? ys))
+               #t)
+              ((or (null? xs) (null? ys))
+               #f)
+              (else
+               (if (equal? (first xs)
+                           (first ys))
+                   (loop (rest xs)
+                         (rest ys))
+                   #f)))))
+          (pair
+           (and
+            (equal? (car x) (car y))
+            (equal? (cdr x) (cdr y))))
+          (else
+           (scheme= x y))))))
 
 ;; ## Symbols and Keywords
 ;; =======================
@@ -61,9 +128,15 @@
 
 ;; ## Seq
 ;; ======
-(define first car)
+(define (first xs)
+  (if (null? xs)
+      null
+      (car xs)))
 
-(define rest cdr)
+(define (rest xs)
+  (if (null? xs)
+      null
+      (cdr xs)))
 
 (define nth list-ref)
 
@@ -116,8 +189,10 @@
 
 (define (map? m)
   (and (list? m)
-       (every? pair? m)))
-
+       (every? pair? m)
+       (if (scheme= 1 (length m))
+           (not (map? (car m)))
+           #t)))
 
 (define (keys m)
   (map car m))
@@ -126,10 +201,10 @@
   (map cdr m))
 
 (define (get m k)
-  (let ((cell (scheme-assoc k m)))
-    (if cell
-        (cdr cell)
-        '())))
+  (let ((pair (find-first (lambda (pair)
+                            (equal? k (first pair)))
+                          m)))
+    (rest pair)))
 
 (define (get-in m ks)
   (if (null? ks)
@@ -237,6 +312,9 @@
 
 (define ** pow)
 
+;; ## Functions
+;; ============
+(define fn? procedure?)
 
 ;; # Core
 ;; ======
