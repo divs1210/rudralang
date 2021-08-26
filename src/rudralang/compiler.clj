@@ -16,13 +16,23 @@
           rhs-name (if (= ::not-found rhs-name-node)
                      (gensym)
                      (last rhs-name-node))
-          lhs-ks   (if (= ::not-found rhs-name-node)
-                     lhs-ks
-                     (take-while #(not= % [:keyword :as]) lhs-ks))]
+          lhs-ks (if (= ::not-found rhs-name-node)
+                   lhs-ks
+                   (drop-last 2 lhs-ks))
+          rest-name-node (u/after lhs-ks [:keyword :and] ::not-found)
+          rest-name (when (not= ::not-found rest-name-node)
+                      (last rest-name-node))
+          lhs-ks (if (= ::not-found rest-name-node)
+                   lhs-ks
+                   (drop-last 2 lhs-ks))
+          rest-rhs (when (some? rest-name)
+                     (list 'drop (count lhs-ks) rhs-name))]
       (list*
        (list rhs-name (compile rhs))
        (apply
         concat
+        (when (some? rest-name)
+          (list (list rest-name rest-rhs)))
         (map-indexed (fn [idx k]
                        (destructuring-bind
                         k

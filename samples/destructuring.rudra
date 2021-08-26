@@ -1,11 +1,11 @@
 defn!(main!, {}, _ =>
-  let v := [1, [2], {:third 3}, [{:fourth 4}]]
+  let v := [1, [2], {:third 3}, [{:fourth 4}], 5, 6]
 
-  let [first, [second], {third}, [{fourth}]] := v
-  println!("destructuring let: " [first, second, third, fourth])
+  let [first, [second], {third}, [{fourth}] :and stuff :as full] := v
+  println!("destructuring let: " [first, second, third, fourth, stuff, full])
 
-  let f := fn([[first, [second], {third}, [{fourth}]]] =>
-    [first, second, third, fourth]
+  let f := fn([[first, [second], {third}, [{fourth}] :and stuff :as full]] =>
+    [first, second, third, fourth, stuff, full]
   )
   println!("destructuring fn: " f(v))
 )
