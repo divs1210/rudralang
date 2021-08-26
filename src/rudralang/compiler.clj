@@ -43,7 +43,13 @@
                      lhs-ks))))
 
     :map
-    (let [rhs-name (gensym)]
+    (let [rhs-name-node (u/after lhs-ks [:keyword :as] ::not-found)
+          rhs-name (if (= ::not-found rhs-name-node)
+                     (gensym)
+                     (last rhs-name-node))
+          lhs-ks (if (= ::not-found rhs-name-node)
+                   lhs-ks
+                   (drop-last 2 lhs-ks))]
       (list*
        (list rhs-name (compile rhs))
        (map (fn [k]
