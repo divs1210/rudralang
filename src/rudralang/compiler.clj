@@ -49,13 +49,29 @@
                      (last rhs-name-node))
           lhs-ks (if (= ::not-found rhs-name-node)
                    lhs-ks
+                   (drop-last 2 lhs-ks))
+          default-map-node (u/after lhs-ks [:keyword :or] ::not-found)
+          default-bindings (when (not= ::not-found default-map-node)
+                             (for [[k v] (partition-all 2 (rest default-map-node))
+                                   :let [k (compile k)
+                                         v (compile v)]]
+                               (list
+                                (list k (list 'if (list 'contains?
+                                                        rhs-name
+                                                        (symbol (str "':" k)))
+                                              k
+                                              v)))))
+          lhs-ks (if (= ::not-found default-map-node)
+                   lhs-ks
                    (drop-last 2 lhs-ks))]
-      (list*
-       (list rhs-name (compile rhs))
+      (apply
+       concat
+       (list (list rhs-name (compile rhs)))
        (map (fn [k]
               (let [k-sym (compile k)]
                 (list k-sym (list 'get rhs-name (symbol (str "':" k-sym))))))
-            lhs-ks)))))
+            lhs-ks)
+       default-bindings))))
 
 (defn compile-do
   [exp]

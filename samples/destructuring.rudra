@@ -1,17 +1,14 @@
 defn!(main!, {}, _ =>
   <* lists *>
   let coll := [1, [2], {:third 3}, [{:fourth 4}], 5, 6]
-
   let [first, [second], {third}, [{fourth}] :and stuff :as full] := coll
   println!("destructuring list: " [first, second, third, fourth, stuff, full])
 
   <* maps *>
-  let {a, b :as m} := {:a 1, :b 2}
-  println!("destructuring map: " [a, b, m])
+  let {a, b, c :or {c 3} :as m} := {:a 1, :b 2}
+  println!("destructuring map: " [a, b, c, m])
 
   <* also works in fn params *>
-  let f := fn([[first, [second], {third}]] =>
-    [first, second, third]
-  )
+  let f := fn([[first, [second], {third}]] => [first, second, third])
   println!("destructuring fn params: " f(coll))
 )
