@@ -17,6 +17,6 @@ inside-comment         = !( "*>" | "<*" ) #"." | comment
 <block_close>          = <"]">
 <curly_open>           = <"{">
 <curly_close>          = <"}">
-<lang_white_space>     = (<#"\s*"> | <"=>"> | <","> | comment)*
+<lang_white_space>     = (<#"\s*"> | <"=>"> | <","> | comment)+
 <lparen>               = <"(">
 <rparen>               = <")">
