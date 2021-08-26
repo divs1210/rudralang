@@ -11,9 +11,11 @@ ns!(fizzbuzz,
   )
 
   defn!(main!, {}, [_, n] =>
+    let n := string->number(n)
+
     for-each(
       fn([x] => println!(fizzbuzz(x))),
-      range(1, (1 + string->number(n)))
+      range(1, (n + 1), 1)
     )
   )
 )
