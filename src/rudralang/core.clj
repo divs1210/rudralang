@@ -46,11 +46,8 @@
                  postlude)))
 
     (println "compiling with chez-exe")
-    (let [res (sh native-compile-cmd "--optimize-level" "3" scheme-filename)
-          out (:out res)
-          out (if (seq out)
-                out
-                (:err res))]
-      (println out))
+    (let [{:keys [err out]}
+          (sh native-compile-cmd "--optimize-level" "3" scheme-filename)]
+      (println (if (seq err) err out)))
 
     (shutdown-agents)))
