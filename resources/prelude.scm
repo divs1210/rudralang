@@ -78,12 +78,20 @@
       (drop (- n 1) (rest xs))
       xs))
 
-(define (every? xs pred)
+(define (every? pred xs)
   (if (null? xs)
       #t
       (if (pred (car xs))
-          (every? (cdr xs) pred)
+          (every? pred (cdr xs))
           #f)))
+
+(define (find-first pred xs)
+  (if (null? xs)
+      null
+      (let ((x (first xs)))
+        (if (pred x)
+            x
+            (find-first pred (rest xs))))))
 
 (define (reduce f init coll)
   (if (null? coll)
@@ -108,7 +116,8 @@
 
 (define (map? m)
   (and (list? m)
-       (every? m pair?)))
+       (every? pair? m)))
+
 
 (define (keys m)
   (map car m))
