@@ -39,6 +39,18 @@
 (define (identity x)
   x)
 
+(define (comp . fs)
+  (cond
+   ((null? fs)
+    identity)
+   ((scheme= 1 (length fs))
+    (car fs))
+   (else
+    (lambda args
+      (let* ((f (last fs))
+             (acc (apply f args)))
+        ((apply comp (drop-last 1 fs)) acc))))))
+
 ;; ## Constants
 ;; ============
 (define null
@@ -148,6 +160,15 @@
 
 (define nth list-ref)
 
+(define (last xs)
+  (cond
+   ((null? xs)
+    null)
+   ((null? (cdr xs))
+    (car xs))
+   (else
+    (last (cdr xs)))))
+
 (define (take n xs)
   (if (> n 0)
       (append (list (first xs))
@@ -158,6 +179,9 @@
   (if (> n 0)
       (drop (- n 1) (rest xs))
       xs))
+
+(define (drop-last n xs)
+  (reverse (drop n (reverse xs))))
 
 (define (pair x y)
   (cons x y))
@@ -307,7 +331,8 @@
 ;; ## IO
 ;; =====
 (define (print! . args)
-  (for-each display args))
+  (for-each (comp display ->string)
+            args))
 
 (define (println! . args)
   (apply print! args)
@@ -381,7 +406,7 @@
       (get x '<type>)
       (type* x)))
 
-(define-syntax defprotocol!
+(define-syntax define-protocol
   (syntax-rules ()
     ((_ proto-name (method-name method-args) ...)
      (begin
@@ -437,7 +462,7 @@
 
 ;; Seqs contd.
 ;; ===========
-(defprotocol! IListable
+(define-protocol IListable
   (->list (this)))
 
 (define (listable? x)
@@ -454,6 +479,75 @@
   (->list identity))
  (Map
   (->list identity)))
+
+;; To String
+;; =========
+(define-protocol IStringable
+  (->string (this)))
+
+(define (str . xs)
+  (apply string-append
+         (map ->string xs)))
+
+(extend-protocol!
+ IStringable
+ (String
+  (->string identity))
+ (Boolean
+  (->string (lambda (this)
+              (if this "true" "false"))))
+ (Number
+  (->string number->string))
+ (Char
+  (->string string))
+ (Keyword
+  (->string symbol->string))
+ (Symbol
+  (->string symbol->string))
+ (Fn
+  (->string (lambda (_) "<Fn>")))
+ (Atom
+  (->string (lambda (this)
+              (str "<Atom(" (deref this) ")>"))))
+ (Map
+  (->string (lambda (this)
+              (str
+               "{"
+               (let loop ((pairs this)
+                          (acc ""))
+                 (if (null? pairs)
+                     acc
+                     (let* ((p (car pairs))
+                            (k (car p))
+                            (v (cdr p))
+                            (pairs (cdr pairs))
+                            (delim (if (null? pairs)
+                                       ""
+                                       ", ")))
+                       (loop pairs
+                             (str acc k " " v delim)))))
+               "}"))))
+ (List
+  (->string (lambda (this)
+              (str
+               "["
+               (let loop ((xs this)
+                          (acc ""))
+                 (if (null? xs)
+                     acc
+                     (let* ((x  (car xs))
+                            (xs (cdr xs))
+                            (delim (if (null? xs)
+                                       ""
+                                       ", ")))
+                       (loop xs
+                             (str acc x delim)))))
+               "]"))))
+ (Pair
+  (->string (lambda (this)
+              (str "(" (car this) " . " (cdr this) ")"))))
+ (<unknown>
+  (->string (lambda _ "<unknown>"))))
 
 
 ;; # User code
