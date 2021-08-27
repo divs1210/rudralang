@@ -34,14 +34,10 @@
    (else
     '<unknown>)))
 
-(define (is-a? type x)
-  (scheme= type (type* x)))
-
-(define (any? x)
-  #t)
-
-(define (unknown? x)
-  (is-a? '<unknown> x))
+;; Util
+;; ====
+(define (identity x)
+  x)
 
 ;; ## Constants
 ;; ============
@@ -376,6 +372,88 @@
 
 (define (rudra-set-def-opts! name x)
   (void))
+
+;; ## Types and Protocols
+;; ======================
+(define (type x)
+  (if (and (map? x)
+           (contains? x '<type>))
+      (get x '<type>)
+      (type* x)))
+
+(define-syntax defprotocol!
+  (syntax-rules ()
+    ((_ proto-name (method-name method-args) ...)
+     (begin
+       (define proto-name
+         (list-map
+          ('<type> 'Protocol)
+          ('methods
+           (list-map
+            ((quote method-name) (quote method-args))
+            ...))
+          ('implementations
+           (list-map
+            ((quote method-name) (atom null))
+            ...))
+          ('extenders (atom null))))
+
+       (begin
+         (define (method-name this . args)
+           (let* ((impls (deref (get-in proto-name (list 'implementations (quote method-name)))))
+                  (t (type this))
+                  (method (get impls t)))
+             (if (null? method)
+                 (raise! (string-append "method "
+                                        (symbol->string (quote method-name))
+                                        " of protocol "
+                                        (symbol->string (quote proto-name))
+                                        " not defined for type: "
+                                        (symbol->string t)))
+                 (apply method this args))))
+         ...)))))
+
+(define-syntax extend-protocol!
+  (syntax-rules ()
+    ((_ protocol (type (method-name method-fn) ...) ...)
+     (begin
+       (let ((p protocol))
+         (let ((t (quote type)))
+           (swap! (get p 'extenders) (lambda (es) (cons t es)))
+           (swap! (get-in p (list 'implementations (quote method-name)))
+                  assoc t method-fn)
+           ...)
+         ...)))))
+
+(define (extenders protocol)
+  (deref (get protocol 'extenders)))
+
+(define (extends? protocol type)
+  (let ((es (extenders protocol)))
+    (truthy?
+     (find-first (lambda (e)
+                   (scheme= type e))
+                 es))))
+
+;; Seqs contd.
+;; ===========
+(defprotocol! IListable
+  (->list (this)))
+
+(define (listable? x)
+  (extends? IListable (type x)))
+
+(extend-protocol!
+ IListable
+ (String
+  (->list string->list))
+ (Pair
+  (->list (lambda (this)
+            (list (car this) (cdr this)))))
+ (List
+  (->list identity))
+ (Map
+  (->list identity)))
 
 
 ;; # User code
