@@ -163,6 +163,9 @@
       (drop (- n 1) (rest xs))
       xs))
 
+(define (pair x y)
+  (cons x y))
+
 (define (every? pred xs)
   (if (null? xs)
       #t
