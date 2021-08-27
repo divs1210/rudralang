@@ -190,6 +190,7 @@
 (define (map? m)
   (and (list? m)
        (every? pair? m)
+       ;; check if list of maps
        (if (scheme= 1 (length m))
            (not (map? (car m)))
            #t)))
