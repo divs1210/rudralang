@@ -2,34 +2,46 @@
                 (assoc scheme-assoc)
                 (merge scheme-merge)
                 (div   scheme-div)
-                (equal? scheme=)))
+                (equal? scheme=)
+                (atom? scheme-atom?)))
 
 ;; ## Internal
 ;; ==========
-(define (type x)
+(define (type* x)
   (cond
    ((boolean? x)
-    'boolean)
+    'Boolean)
    ((number? x)
-    'number)
+    'Number)
    ((char? x)
-    'char)
+    'Char)
+   ((keyword? x)
+    'Keyword)
    ((symbol? x)
-    'symbol)
+    'Symbol)
    ((string? x)
-    'string)
+    'String)
    ((fn? x)
-    'fn)
-   ((box? x)
-    'box)
+    'Fn)
+   ((atom? x)
+    'Atom)
    ((map? x)
-    'map)
+    'Map)
    ((list? x)
-    'list)
+    'List)
    ((pair? x)
-    'pair)
+    'Pair)
    (else
-    'unknown)))
+    '<unknown>)))
+
+(define (is-a? type x)
+  (scheme= type (type* x)))
+
+(define (any? x)
+  #t)
+
+(define (unknown? x)
+  (is-a? '<unknown> x))
 
 ;; ## Constants
 ;; ============
@@ -57,13 +69,13 @@
   (eq? x y))
 
 (define (equal? x y)
-  (let ((t (type x)))
-    (if (not (scheme= t (type y)))
+  (let ((t (type* x)))
+    (if (not (scheme= t (type* y)))
         #f
         (case t
-          ((fn box)
+          ((Fn Atom)
            (same? x y))
-          (map
+          (Map
            (and
             (scheme= (length x) (length y))
             (every? (lambda (pair)
@@ -74,7 +86,7 @@
                          (equal? v (get y k))
                          #t)))
                     x)))
-          (list
+          (List
            (let loop ((xs x)
                       (ys y))
              (cond
@@ -88,7 +100,7 @@
                    (loop (rest xs)
                          (rest ys))
                    #f)))))
-          (pair
+          (Pair
            (and
             (equal? (car x) (car y))
             (equal? (cdr x) (cdr y))))
@@ -116,7 +128,7 @@
 (define (keyword? k)
   (and
    (symbol? k)
-   (equal? #\: (string-ref (symbol->string k) 0))))
+   (scheme= #\: (string-ref (symbol->string k) 0))))
 
 (define (name sym-or-kw)
   (if (symbol? sym-or-kw)
@@ -276,6 +288,9 @@
 ;; ========
 (define (atom x)
   (box x))
+
+(define (atom? x)
+  (box? x))
 
 (define (deref atm)
   (unbox atm))
