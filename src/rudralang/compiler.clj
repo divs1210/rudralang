@@ -255,5 +255,15 @@
              ;; default
              (compile arg))))
 
+       scheme
+       (do
+         (assert (= 1 (count args))
+                 "more than 1 string passed to scheme")
+         (let [[arg] args
+               [tag s] arg]
+           (assert (= :string tag)
+                   "non string literal passed to scheme")
+           (symbol s)))
+
        ;; default
        (cons op (map compile args))))))
