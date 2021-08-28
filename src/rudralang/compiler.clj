@@ -230,5 +230,30 @@
        do
        (recur (vec (cons :do args)))
 
+       quote
+       (do
+         (assert (= 1 (count args))
+                 "more than 1 args passed to quote")
+         (let [[arg] args
+               [tag & xs] arg]
+           (case tag
+             :list
+             (->> xs
+                  (map #(vector :form [:symbol 'quote] %))
+                  (u/concatv [:list])
+                  compile)
+
+             :map
+             (->> xs
+                  (map #(vector :form [:symbol 'quote] %))
+                  (u/concatv [:map])
+                  compile)
+
+             (:symbol :form)
+             (list 'quote (compile arg))
+
+             ;; default
+             (compile arg))))
+
        ;; default
        (cons op (map compile args))))))
