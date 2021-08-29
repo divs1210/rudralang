@@ -7,32 +7,46 @@
 
 ;; ## Internal
 ;; ==========
+(define Boolean 'Boolean)
+(define Number  'Number)
+(define Char    'Char)
+(define Keyword 'Keyword)
+(define Symbol  'Symbol)
+(define String  'String)
+(define Fn      'Fn)
+(define Atom    'Atom)
+(define Map     'Map)
+(define List    'List)
+(define Pair    'Pair)
+(define <unknown> '<unknown>)
+(define <default> '<default>)
+
 (define (type* x)
   (cond
    ((boolean? x)
-    'Boolean)
+    Boolean)
    ((number? x)
-    'Number)
+    Number)
    ((char? x)
-    'Char)
+    Char)
    ((keyword? x)
-    'Keyword)
+    Keyword)
    ((symbol? x)
-    'Symbol)
+    Symbol)
    ((string? x)
-    'String)
+    String)
    ((fn? x)
-    'Fn)
+    Fn)
    ((atom? x)
-    'Atom)
+    Atom)
    ((map? x)
-    'Map)
+    Map)
    ((list? x)
-    'List)
+    List)
    ((pair? x)
-    'Pair)
+    Pair)
    (else
-    '<unknown>)))
+    <unknown>)))
 
 ;; Util
 ;; ====
@@ -196,10 +210,18 @@
 (define (find-first pred xs)
   (if (null? xs)
       null
-      (let ((x (first xs)))
+      (let ((x (car xs)))
         (if (pred x)
             x
-            (find-first pred (rest xs))))))
+            (find-first pred (cdr xs))))))
+
+(define (list-contains? xs x)
+  (if (null? xs)
+      #f
+      (let ((y (car xs)))
+        (if (equal? x y)
+            #t
+            (list-contains? (cdr xs) x)))))
 
 (define (reduce f init coll)
   (if (null? coll)
@@ -331,8 +353,7 @@
 ;; ## IO
 ;; =====
 (define (print! . args)
-  (for-each (comp display ->string)
-            args))
+  (display (apply str args)))
 
 (define (println! . args)
   (apply print! args)
@@ -365,148 +386,201 @@
       (get x '<type>)
       (type* x)))
 
+(define (methods protocol)
+  (deref (get protocol 'methods)))
+
+(define (add-method! protocol method)
+  (let ((methods-atom (get protocol 'methods)))
+    (when (not (list-contains? (deref methods-atom)
+                               method))
+        (swap! methods-atom
+               (lambda (ms)
+                 (cons method ms))))))
+
+(define (implementors protocol method)
+  (get (deref (get protocol 'implementors))
+       method))
+
+(define (add-implementor! protocol method type)
+  (let* ((implementors-atom (get protocol 'implementors))
+         (implementors-of-method (implementors protocol method)))
+    (when (not (list-contains? implementors-of-method type))
+      (swap! implementors-atom
+             update method
+             (lambda (ts)
+               (cons type ts))))))
+
+(define (implementation protocol method type)
+  (let ((impl (get-in (deref (get protocol 'implementations))
+                       (list method type))))
+    (cond
+     ((and (null? impl)
+           (scheme= '<default> type))
+      (raise! (string-append
+               "No default method "
+               (name method)
+               " of protocol "
+               (name (get protocol 'name))
+               " defined.")))
+     ((null? impl)
+      (implementation protocol method '<default>))
+     (else
+      impl))))
+
+(define (add-implementation! protocol method type fn)
+  (swap! (get protocol 'implementations)
+         assoc-in (list method type) fn))
+
+(define (method* protocol method-name)
+  (lambda args
+    (let* ((f (implementation protocol method-name (type (first args)))))
+      (apply f args))))
+
+(define Protocol 'Protocol)
+
 (define-syntax define-protocol
   (syntax-rules ()
-    ((_ proto-name (method-name method-args) ...)
-     (begin
-       (define proto-name
-         (list-map
-          ('<type> 'Protocol)
-          ('methods
-           (list-map
-            ((quote method-name) (quote method-args))
-            ...))
-          ('implementations
-           (list-map
-            ((quote method-name) (atom null))
-            ...))
-          ('extenders (atom null))))
+    ((_ proto-name)
+     (define proto-name
+       (list-map
+        ('<type> Protocol)
+        ('name (quote proto-name))
+        ('methods (atom null))
+        ('implementors (atom (list-map)))
+        ('implementations (atom (list-map))))))))
 
-       (begin
-         (define (method-name this . args)
-           (let* ((impls (deref (get-in proto-name (list 'implementations (quote method-name)))))
-                  (t (type this))
-                  (method (get impls t)))
-             (if (null? method)
-                 (raise! (string-append "method "
-                                        (symbol->string (quote method-name))
-                                        " of protocol "
-                                        (symbol->string (quote proto-name))
-                                        " not defined for type: "
-                                        (symbol->string t)))
-                 (apply method this args))))
-         ...)))))
-
-(define-syntax extend-protocol!
+(define-syntax implement-method!
   (syntax-rules ()
-    ((_ protocol (type (method-name method-fn) ...) ...)
+    ((_ protocol method _type fn)
      (begin
-       (let ((p protocol))
-         (let ((t (quote type)))
-           (swap! (get p 'extenders) (lambda (es) (cons t es)))
-           (swap! (get-in p (list 'implementations (quote method-name)))
-                  assoc t method-fn)
-           ...)
-         ...)))))
+       (add-method! protocol (quote method))
+       (add-implementor! protocol (quote method) _type)
+       (add-implementation! protocol (quote method) _type fn)))))
 
-(define (extenders protocol)
-  (deref (get protocol 'extenders)))
+(define-syntax method
+  (syntax-rules ()
+    ((_ protocol method)
+     (method* protocol (quote method)))))
 
-(define (extends? protocol type)
-  (let ((es (extenders protocol)))
-    (truthy?
-     (find-first (lambda (e)
-                   (scheme= type e))
-                 es))))
 
-;; Seqs contd.
-;; ===========
-(define-protocol IListable
-  (->list (this)))
+;; Rudra core methods
+;; ==================
+(define-protocol IRudra)
 
-(define (listable? x)
-  (extends? IListable (type x)))
+;; ->list
+;; ======
+(implement-method!
+ IRudra ->list List
+ identity)
 
-(extend-protocol!
- IListable
- (String
-  (->list string->list))
- (Pair
-  (->list (lambda (this)
-            (list (car this) (cdr this)))))
- (List
-  (->list identity))
- (Map
-  (->list identity)))
+(implement-method!
+ IRudra ->list Map
+ identity)
 
-;; To String
-;; =========
-(define-protocol IStringable
-  (->string (this)))
+(implement-method!
+ IRudra ->list String
+ string->list)
+
+(implement-method!
+ IRudra ->list Pair
+ (lambda (this)
+   (list (car this) (cdr this))))
+
+;; ->string
+;; ========
+(implement-method!
+ IRudra ->string String
+ identity)
+
+(implement-method!
+ IRudra ->string Boolean
+ (lambda (this)
+   (if this "true" "false")))
+
+(implement-method!
+ IRudra ->string Number
+ number->string)
+
+(implement-method!
+ IRudra ->string Char
+ string)
+
+(implement-method!
+ IRudra ->string Char
+ string)
+
+(implement-method!
+ IRudra ->string Keyword
+ symbol->string)
+
+(implement-method!
+ IRudra ->string Symbol
+ symbol->string)
+
+(implement-method!
+ IRudra ->string Fn
+ (lambda _ "<Fn>"))
+
+(implement-method!
+ IRudra ->string Atom
+ (lambda (this)
+   (str "<Atom(" (deref this) ")>")))
+
+(implement-method!
+ IRudra ->string Map
+ (lambda (this)
+   (str
+    "{"
+    (let loop ((pairs this)
+               (acc ""))
+      (if (null? pairs)
+          acc
+          (let* ((p (car pairs))
+                 (k (car p))
+                 (v (cdr p))
+                 (pairs (cdr pairs))
+                 (delim (if (null? pairs)
+                            ""
+                            ", ")))
+            (loop pairs
+                  (str acc k " " v delim)))))
+    "}")))
+
+(implement-method!
+ IRudra ->string List
+ (lambda (this)
+   (str
+    "["
+    (let loop ((xs this)
+               (acc ""))
+      (if (null? xs)
+          acc
+          (let* ((x  (car xs))
+                 (xs (cdr xs))
+                 (delim (if (null? xs)
+                            ""
+                            ", ")))
+            (loop xs
+                  (str acc x delim)))))
+    "]")))
+
+(implement-method!
+ IRudra ->string Pair
+ (lambda (this)
+   (str "(" (car this) " . " (cdr this) ")")))
+
+(implement-method!
+ IRudra ->string <default>
+ (lambda (obj)
+   (if (and (map? obj)
+            (contains? obj '<type>))
+       (let ((impl (implementation IRudra '->string Map)))
+         (impl obj))
+       "<unknown>")))
 
 (define (str . xs)
   (apply string-append
-         (map ->string xs)))
-
-(extend-protocol!
- IStringable
- (String
-  (->string identity))
- (Boolean
-  (->string (lambda (this)
-              (if this "true" "false"))))
- (Number
-  (->string number->string))
- (Char
-  (->string string))
- (Keyword
-  (->string symbol->string))
- (Symbol
-  (->string symbol->string))
- (Fn
-  (->string (lambda (_) "<Fn>")))
- (Atom
-  (->string (lambda (this)
-              (str "<Atom(" (deref this) ")>"))))
- (Map
-  (->string (lambda (this)
-              (str
-               "{"
-               (let loop ((pairs this)
-                          (acc ""))
-                 (if (null? pairs)
-                     acc
-                     (let* ((p (car pairs))
-                            (k (car p))
-                            (v (cdr p))
-                            (pairs (cdr pairs))
-                            (delim (if (null? pairs)
-                                       ""
-                                       ", ")))
-                       (loop pairs
-                             (str acc k " " v delim)))))
-               "}"))))
- (List
-  (->string (lambda (this)
-              (str
-               "["
-               (let loop ((xs this)
-                          (acc ""))
-                 (if (null? xs)
-                     acc
-                     (let* ((x  (car xs))
-                            (xs (cdr xs))
-                            (delim (if (null? xs)
-                                       ""
-                                       ", ")))
-                       (loop xs
-                             (str acc x delim)))))
-               "]"))))
- (Pair
-  (->string (lambda (this)
-              (str "(" (car this) " . " (cdr this) ")"))))
- (<unknown>
-  (->string (lambda _ "<unknown>"))))
+         (map (method IRudra ->string) xs)))
 
 
 ;; # User code
