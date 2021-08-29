@@ -4,26 +4,9 @@
 
 A dynamic general-purpose high-level functional-programming language with familiar syntax.
 
-## Code Example
+## Code Examples
 
-[Example factorial program](samples/fact.rudra):
-
-```
-ns!(fact,
-  {} =>
-
-  defn!(fact, {}, [n] =>
-    cond(
-      equal?(n, 0) => 1,
-      :else        => (n * fact((n - 1)))
-    )
-  )
-
-  defn!(main!, {}, [_, n] =>
-    println!(fact(string->number(n)))
-  )
-)
-```
+Check out the [sample programs](samples/).
 
 ## Goals
 

@@ -3,6 +3,11 @@
   (:require [clojure.core.match :refer [match]]
             [rudralang.util :as u]))
 
+(defn- rudra-get
+  [m k not-found]
+  (let [kvs (rest m)]
+    (u/after kvs k not-found)))
+
 (declare compile)
 
 (defn destructuring-bind
@@ -185,16 +190,16 @@
             [:symbol 'do]
             exps))))
 
-       def!
-       (let [[name _ val] (map compile args)]
-         (list 'define name val))
-
        defn!
-       (let [[name opts argv & body] args]
+       (let [[name opts argv & body] args
+             for (rudra-get opts
+                            [:keyword :for]
+                            [:symbol '<default>])]
          (recur [:form
-                 [:symbol 'def!]
+                 [:symbol 'implement-method!]
+                 [:symbol 'IRudra]
                  name
-                 opts
+                 [:symbol (compile for)]
                  (vec (list* :fn argv body))]))
 
        fn

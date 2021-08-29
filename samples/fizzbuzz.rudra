@@ -1,6 +1,8 @@
 ns!(fizzbuzz,
   {} =>
 
+  let fizzbuzz := method(IRudra, fizzbuzz)
+
   defn!(fizzbuzz, {}, [n] =>
     cond(
       zero?(mod(n, 15)) => "FizzBuzz"

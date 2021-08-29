@@ -1,6 +1,8 @@
 ns!(fact,
   {} =>
 
+  let fact := method(IRudra, fact)
+
   defn!(fact, {}, [n] =>
     cond(
       equal?(n, 0) => 1,

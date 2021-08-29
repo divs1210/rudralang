@@ -1,0 +1,20 @@
+ns!(protocols,
+  {} =>
+
+  let haba := method(IRudra, haba)
+
+  defn!(haba, {}, [x] =>
+    str("Haba! " x)
+  )
+
+  defn!(haba,
+    {:for Map},
+    [x] =>
+    str("Haba map! " x)
+  )
+
+  defn!(main!, {}, _ =>
+    println!(haba(:x))
+    println!(haba({:x 1}))
+  )
+)

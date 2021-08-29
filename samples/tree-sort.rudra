@@ -1,6 +1,11 @@
 ns!(tree-sort,
   {} =>
 
+  let place := method(IRudra, place)
+  let make-tree := method(IRudra, make-tree)
+  let walk := method(IRudra, walk)
+  let tree-sort := method(IRudra, tree-sort)
+
   defn!(place, {}, [tree, x] =>
     cond(
       null?(tree) =>
