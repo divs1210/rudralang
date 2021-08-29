@@ -1,7 +1,7 @@
 ns!(protocols,
   {} =>
 
-  let haba := method(IRudra, haba)
+  declare!(haba)
 
   defn!(haba, {}, [x] =>
     str("Haba! " x)

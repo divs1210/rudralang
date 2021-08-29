@@ -1,7 +1,7 @@
 ns!(fizzbuzz,
   {} =>
 
-  let fizzbuzz := method(IRudra, fizzbuzz)
+  declare!(fizzbuzz)
 
   defn!(fizzbuzz, {}, [n] =>
     cond(

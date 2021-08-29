@@ -190,6 +190,14 @@
             [:symbol 'do]
             exps))))
 
+       declare!
+       (let [syms (map compile args)]
+         (cons
+          'begin
+          (map #(list 'define %
+                      (list 'method 'IRudra %))
+               syms)))
+
        defn!
        (let [[name opts argv & body] args
              for (rudra-get opts
