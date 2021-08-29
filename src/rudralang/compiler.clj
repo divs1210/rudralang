@@ -177,22 +177,17 @@
    (let [op (compile op)]
      (case op
        ns!
-       (let [[name opts & exps] (map compile args)
-             name-sym (symbol (str "'" name))]
-         (list
-          'begin
-          (list 'rudra-set-ns! name-sym)
-          (list 'rudra-set-ns-opts! name-sym opts)
-          (cons 'begin exps)))
+       (let [[_ _ & exps] args]
+         (compile
+          (vec
+           (list*
+            :form
+            [:symbol 'do]
+            exps))))
 
        def!
-       (let [[name opts val] (map compile args)
-             name-sym (symbol (str "'" name))]
-         (list
-          'begin
-          (list 'define name val)
-          #_(list 'rudra-set-def! name val)
-          (list 'rudra-set-def-opts! name-sym opts)))
+       (let [[name _ val] (map compile args)]
+         (list 'define name val))
 
        defn!
        (let [[name opts argv & body] args]

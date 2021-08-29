@@ -356,47 +356,6 @@
 ;; ============
 (define fn? procedure?)
 
-;; # Core
-;; ======
-(define rudra-current-ns
-  (atom 'rudra.core))
-
-(define (rudra-set-ns! name)
-  (reset! rudra-current-ns name))
-
-(define (rudra-set-ns-opts! ns opts)
-  (void))
-
-(define rudra-env
-  (atom (list-map)))
-
-(define (rudra-extend-env env bindings)
-  (atom (merge (list-map
-                ('__parent__ env))
-               bindings)))
-
-(define (rudra-lookup-env _env ns k)
-  (let ((env (deref _env)))
-    (cond
-     ((contains? (deref env) k)
-      (get env (list ns k)))
-
-     ((contains? env '__parent__)
-      (rudra-lookup-env (get env '__parent__) ns k))
-
-     ((contains? env (list 'rudra.core k))
-      (rudra-lookup-env env (list 'rudra.core k)))
-
-     (else (raise! (string-append "Not defined: " (symbol->string k)))))))
-
-(define (rudra-def! name x)
-  (let ((ns (deref rudra-current-ns)))
-    (swap! rudra-env
-           (lambda (e)
-             (assoc e (list ns name))))))
-
-(define (rudra-set-def-opts! name x)
-  (void))
 
 ;; ## Types and Protocols
 ;; ======================
