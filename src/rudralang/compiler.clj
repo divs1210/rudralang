@@ -78,6 +78,20 @@
             lhs-ks)
        default-bindings))))
 
+(defn compile-letfn
+  [exp]
+  (match exp
+    [:do & [[:symbol 'letfn] [:symbol name] [:keyword :=] argv body & others]]
+    (loop [bindings (list (list name (compile [:fn argv body])))
+           [next-node & more :as remaining] others]
+      (if (= [:keyword :and] next-node)
+        (let [[[_ name] _ argv body & others] more]
+          (recur (concat bindings
+                         [(list name (compile [:fn argv body]))])
+                 others))
+        (list 'letrec bindings
+              (compile (vec (cons :do remaining))))))))
+
 (defn compile-do
   [exp]
   (match exp
@@ -91,6 +105,9 @@
    [:do & [[:symbol 'let] & others]]
    (u/throw+ "Syntax error - let should be of the form:\n"
              "  let name := value")
+
+   [:do & [[:symbol 'letfn] & _]]
+   (compile-letfn exp)
 
    [:do e]
    (compile e)

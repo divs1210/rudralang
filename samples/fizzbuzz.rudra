@@ -1,16 +1,13 @@
 ns!(fizzbuzz,
   {} =>
 
-  declare!(fizzbuzz)
-
-  defn!(fizzbuzz, {}, [n] =>
+  letfn fizzbuzz := [n] =>
     cond(
       zero?(mod(n, 15)) => "FizzBuzz"
       zero?(mod(n, 5))  => "Buzz"
       zero?(mod(n, 3))  => "Fizz"
       :else             => n
     )
-  )
 
   defn!(main!, {}, [_, n] =>
     let n := string->number(n)

@@ -1,0 +1,18 @@
+ns!(letfn,
+  {} =>
+
+  letfn is-even? := [n] =>
+    cond(
+      zero?(n) => true
+      :else    => is-odd?((n - 1))
+    )
+  :and    is-odd? := [n] =>
+    cond(
+      zero?(n) => false
+      :else    => is-even?((n - 1))
+    )
+
+  defn!(main!, {}, _ =>
+    println!(is-even?(100000))
+  )
+)

@@ -1,9 +1,7 @@
 ns!(tree-sort,
   {} =>
 
-  declare!(place, make-tree, walk, tree-sort)
-
-  defn!(place, {}, [tree, x] =>
+  letfn place := [tree, x] =>
     cond(
       null?(tree) =>
         {:val x
@@ -14,9 +12,8 @@ ns!(tree-sort,
       :else =>
         update(tree, :rtree, place, x)
     )
-  )
 
-  defn!(make-tree, {}, [nums] =>
+  letfn make-tree := [nums] =>
     loop([tree := {}
           remaining := nums] =>
       cond(
@@ -29,9 +26,8 @@ ns!(tree-sort,
           )
       )
     )
-  )
 
-  defn!(walk, {}, [tree] =>
+  letfn walk := [tree] =>
     cond(
       null?(tree) =>
         null
@@ -42,11 +38,9 @@ ns!(tree-sort,
           walk(get(tree, :rtree))
         )
     )
-  )
 
-  defn!(tree-sort, {}, [nums] =>
+  letfn tree-sort := [nums] =>
     walk(make-tree(nums))
-  )
 
   defn!(main!, {}, args =>
     let strs := rest(args)
