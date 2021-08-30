@@ -371,6 +371,8 @@
 
 (define pow expt)
 
+(define % mod)
+
 (define ** pow)
 
 (define == equal?)
