@@ -3,12 +3,12 @@ ns!(letfn,
 
   letfn is-even? := [n] =>
     cond(
-      zero?(n) => true
+      (n == 0) => true
       :else    => is-odd?((n - 1))
     )
-  :and    is-odd? := [n] =>
+  :and is-odd? := [n] =>
     cond(
-      zero?(n) => false
+      (n == 0) => false
       :else    => is-even?((n - 1))
     )
 

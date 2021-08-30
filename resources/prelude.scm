@@ -2,7 +2,7 @@
                 (assoc scheme-assoc)
                 (merge scheme-merge)
                 (div   scheme-div)
-                (equal? scheme=)
+                (equal? scheme-equal?)
                 (atom? scheme-atom?)))
 
 ;; ## Internal
@@ -57,7 +57,7 @@
   (cond
    ((null? fs)
     identity)
-   ((scheme= 1 (length fs))
+   ((scheme-equal? 1 (length fs))
     (car fs))
    (else
     (lambda args
@@ -92,14 +92,14 @@
 
 (define (equal? x y)
   (let ((t (type* x)))
-    (if (not (scheme= t (type* y)))
+    (if (not (scheme-equal? t (type* y)))
         #f
         (case t
           ((Fn Atom)
            (same? x y))
           (Map
            (and
-            (scheme= (length x) (length y))
+            (scheme-equal? (length x) (length y))
             (every? (lambda (pair)
                       (let ((k (car pair))
                             (v (cdr pair)))
@@ -127,7 +127,7 @@
             (equal? (car x) (car y))
             (equal? (cdr x) (cdr y))))
           (else
-           (scheme= x y))))))
+           (scheme-equal? x y))))))
 
 ;; ## Symbols and Keywords
 ;; =======================
@@ -150,7 +150,7 @@
 (define (keyword? k)
   (and
    (symbol? k)
-   (scheme= #\: (string-ref (symbol->string k) 0))))
+   (scheme-equal? #\: (string-ref (symbol->string k) 0))))
 
 (define (name sym-or-kw)
   (if (symbol? sym-or-kw)
@@ -248,7 +248,7 @@
   (and (list? m)
        (every? pair? m)
        ;; check if list of maps
-       (if (scheme= 1 (length m))
+       (if (scheme-equal? 1 (length m))
            (not (map? (car m)))
            #t)))
 
@@ -373,6 +373,16 @@
 
 (define ** pow)
 
+(define == equal?)
+
+(define lt <)
+
+(define gt >)
+
+(define lte <=)
+
+(define gte >=)
+
 ;; ## Functions
 ;; ============
 (define fn? procedure?)
@@ -415,7 +425,7 @@
                        (list method type))))
     (cond
      ((and (null? impl)
-           (scheme= '<default> type))
+           (scheme-equal? '<default> type))
       (raise! (string-append
                "No default method "
                (name method)

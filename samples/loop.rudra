@@ -1,7 +1,7 @@
 defn!(main!, {}, [_, n] =>
   loop([n := string->number(n)] =>
     cond(
-      zero?(n) =>
+      (n == 0) =>
         null
       :else =>
         do(

@@ -3,8 +3,8 @@ ns!(fact,
 
   letfn fact := [n] =>
     cond(
-      equal?(n, 0) => 1,
-      :else        => (n * fact((n - 1)))
+      (n == 0) => 1,
+      :else    => (n * fact((n - 1)))
     )
 
   defn!(main!, {}, [_, n] =>
