@@ -379,7 +379,7 @@
 (define (== x y)
   (if (number? x)
       (scheme-equal? x y)
-      (raise! (str "non-primitive value " x " passed to =="))))
+      (raise! (str "non-number " x " passed to =="))))
 
 (define lt <)
 
