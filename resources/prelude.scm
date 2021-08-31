@@ -376,7 +376,10 @@
 
 (define ** pow)
 
-(define == equal?)
+(define (== x y)
+  (if (number? x)
+      (scheme-equal? x y)
+      (raise! (str "non-primitive value " x " passed to =="))))
 
 (define lt <)
 
