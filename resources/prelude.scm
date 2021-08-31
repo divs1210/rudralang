@@ -394,10 +394,11 @@
 ;; ## Types and Protocols
 ;; ======================
 (define (type x)
-  (if (and (map? x)
-           (contains? x '<type>))
-      (get x '<type>)
-      (type* x)))
+  (let ((t (type* x)))
+    (if (and (scheme-equal? Map t)
+             (contains? x '<type>))
+        (get x '<type>)
+        t)))
 
 (define (methods protocol)
   (deref (get protocol 'methods)))
