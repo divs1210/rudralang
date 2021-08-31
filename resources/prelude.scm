@@ -143,7 +143,7 @@
    ((string? s)
     (string->keyword s))
 
-   (else (raise! "non string/symbol passed to keyword"))))
+   (else (raise! (str "non string/symbol " s " passed to keyword")))))
 
 (define (keyword? k)
   (and
@@ -156,7 +156,7 @@
         (if (equal? #\: (string-ref str 0))
             (list->string (rest (string->list str)))
             str))
-      (raise! "non symbol/keyword passed to name")))
+      (raise! (str "non symbol/keyword " sym-or-kw " passed to name"))))
 
 ;; ## Seq
 ;; ======
