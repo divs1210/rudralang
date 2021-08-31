@@ -453,6 +453,11 @@
     (let* ((f (implementation protocol method-name (type (first args)))))
       (apply f args))))
 
+(define-syntax method
+  (syntax-rules ()
+    ((_ protocol method)
+     (method* protocol (quote method)))))
+
 (define Protocol 'Protocol)
 
 (define-syntax define-protocol
@@ -473,11 +478,6 @@
        (add-method! protocol (quote method))
        (add-implementor! protocol (quote method) _type)
        (add-implementation! protocol (quote method) _type fn)))))
-
-(define-syntax method
-  (syntax-rules ()
-    ((_ protocol method)
-     (method* protocol (quote method)))))
 
 
 ;; Rudra core methods
