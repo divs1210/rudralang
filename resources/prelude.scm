@@ -23,10 +23,10 @@
 
 (define (type* x)
   (cond
-   ((boolean? x)
-    Boolean)
    ((number? x)
     Number)
+   ((boolean? x)
+    Boolean)
    ((char? x)
     Char)
    ((keyword? x)
@@ -92,42 +92,40 @@
 
 (define (equal? x y)
   (let ((t (type* x)))
-    (if (not (scheme-equal? t (type* y)))
-        #f
-        (case t
-          ((Fn Atom)
-           (same? x y))
-          (Map
-           (and
-            (scheme-equal? (length x) (length y))
-            (every? (lambda (pair)
-                      (let ((k (car pair))
-                            (v (cdr pair)))
-                        (and
-                         (contains? y k)
-                         (equal? v (get y k))
-                         #t)))
-                    x)))
-          (List
-           (let loop ((xs x)
-                      (ys y))
-             (cond
-              ((and (null? xs) (null? ys))
-               #t)
-              ((or (null? xs) (null? ys))
-               #f)
-              (else
-               (if (equal? (first xs)
-                           (first ys))
-                   (loop (rest xs)
-                         (rest ys))
-                   #f)))))
-          (Pair
-           (and
-            (equal? (car x) (car y))
-            (equal? (cdr x) (cdr y))))
+    (case t
+      ((Fn Atom)
+       (same? x y))
+      (Map
+       (and
+        (scheme-equal? (length x) (length y))
+        (every? (lambda (pair)
+                  (let ((k (car pair))
+                        (v (cdr pair)))
+                    (and
+                     (contains? y k)
+                     (equal? v (get y k))
+                     #t)))
+                x)))
+      (List
+       (let loop ((xs x)
+                  (ys y))
+         (cond
+          ((and (null? xs) (null? ys))
+           #t)
+          ((or (null? xs) (null? ys))
+           #f)
           (else
-           (scheme-equal? x y))))))
+           (if (equal? (first xs)
+                       (first ys))
+               (loop (rest xs)
+                     (rest ys))
+               #f)))))
+      (Pair
+       (and
+        (equal? (car x) (car y))
+        (equal? (cdr x) (cdr y))))
+      (else
+       (scheme-equal? x y)))))
 
 ;; ## Symbols and Keywords
 ;; =======================
