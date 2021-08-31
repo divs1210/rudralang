@@ -75,6 +75,14 @@ $ lein -compile samples/fact.rudra
 $ target/fact 5
 ```
 
+### REPL
+
+In the rudralang directory, run:
+
+```
+$ ./repl
+```
+
 ## License
 
 Copyright © 2021 Divyansh Prakash

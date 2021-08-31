@@ -127,6 +127,24 @@
       (else
        (scheme-equal? x y)))))
 
+;; ## Strings
+;; ==========
+(define (string-replace-all haystack needle replacement)
+  (let ((haystack (string->list haystack))
+        (needle (string->list needle))
+        (replacement (string->list replacement))
+        (needle-len (string-length needle)))
+    (let loop ((haystack haystack)
+               (acc '()))
+      (cond ((null? haystack)
+             (list->string (reverse acc)))
+            ((starts-with? haystack needle)
+             (loop (list-tail haystack needle-len)
+                   (append (reverse replacement) acc)))
+            (else
+             (loop (cdr haystack)
+                   (cons (car haystack) acc)))))))
+
 ;; ## Symbols and Keywords
 ;; =======================
 (define (string->keyword s)
@@ -187,6 +205,9 @@
               (take (- n 1) (rest xs)))
       null))
 
+(define (take-last n xs)
+  (reverse (take n (reverse xs))))
+
 (define (drop n xs)
   (if (> n 0)
       (drop (- n 1) (rest xs))
@@ -231,6 +252,14 @@
     (if (compare start end)
         (cons start (range (update start) end step))
         null)))
+
+(define (starts-with? xs head)
+  (let* ((n (length head)))
+    (scheme-equal? head (take n xs))))
+
+(define (ends-with? xs tail)
+  (let* ((n (length tail)))
+    (scheme-equal? tail (take-last n xs))))
 
 ;; ## Maps
 ;; =======

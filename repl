@@ -1,0 +1,4 @@
+#! /bin/sh
+
+rm .rudra-repl >/dev/null 2>&1
+rlwrap scheme --script resources/repl.scm

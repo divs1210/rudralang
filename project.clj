@@ -9,4 +9,8 @@
   :main ^:skip-aot rudralang.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
-  :aliases {"-compile" ["trampoline" "run" "-m" "rudralang.core"]})
+  :aliases {"-compile"
+            ["trampoline" "run" "-m" "rudralang.core"]
+
+            "-compile-exp"
+            ["trampoline" "run" "-m" "rudralang.expression-compiler"]})
