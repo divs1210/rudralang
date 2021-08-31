@@ -197,9 +197,6 @@
 (define (drop-last n xs)
   (reverse (drop n (reverse xs))))
 
-(define (pair x y)
-  (cons x y))
-
 (define (every? pred xs)
   (if (null? xs)
       #t
@@ -239,24 +236,30 @@
 
 ;; ## Maps
 ;; =======
+(define (pair x y)
+  (cons x y))
+
+(define map-type-tag
+  (pair '<map> #t))
+
 (define-syntax list-map
   (syntax-rules ()
     ((_ (k1 v1) ...)
-     (list (cons k1 v1) ...))))
+     (list
+      map-type-tag
+      (cons k1 v1)
+      ...))))
 
 (define (map? m)
   (and (list? m)
        (every? pair? m)
-       ;; check if list of maps
-       (if (scheme-equal? 1 (length m))
-           (not (map? (car m)))
-           #t)))
+       (list-contains? m map-type-tag)))
 
 (define (keys m)
-  (map car m))
+  (map car (dissoc m '<map>)))
 
 (define (vals m)
-  (map cdr m))
+  (map cdr (dissoc m '<map>)))
 
 (define (get m k)
   (let ((pair (find-first (lambda (pair)
@@ -315,7 +318,7 @@
             (loop (cdr ks))))))
 
 (define (zipmap ks vs)
-  (let recur ((m '())
+  (let recur ((m (list-map))
               (ks ks)
               (vs vs))
     (if (null? ks)
@@ -487,7 +490,8 @@
 
 (implement-method!
  IRudra ->list Map
- identity)
+ (lambda (m)
+   (dissoc m '<map>)))
 
 (implement-method!
  IRudra ->list String
@@ -497,6 +501,9 @@
  IRudra ->list Pair
  (lambda (this)
    (list (car this) (cdr this))))
+
+(define ->list
+  (method IRudra ->list))
 
 ;; ->string
 ;; ========
@@ -543,7 +550,7 @@
  (lambda (this)
    (str
     "{"
-    (let loop ((pairs this)
+    (let loop ((pairs (->list this))
                (acc ""))
       (if (null? pairs)
           acc
@@ -590,9 +597,12 @@
          (impl obj))
        "<unknown>")))
 
+(define ->string
+  (method IRudra ->string))
+
 (define (str . xs)
   (apply string-append
-         (map (method IRudra ->string) xs)))
+         (map ->string xs)))
 
 
 ;; # User code
