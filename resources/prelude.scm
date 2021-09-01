@@ -305,7 +305,7 @@
 (define (vals m)
   (map cdr (dissoc m '<map>)))
 
-(define (entries m)
+(define (map-entries m)
   (remove-first (lambda (x)
                   (equal? map-type-tag x))
                 m))
@@ -555,7 +555,7 @@
 
 (implement-method!
  IRudra ->list Map
- entries)
+ map-entries)
 
 (implement-method!
  IRudra ->list String
@@ -614,7 +614,7 @@
  (lambda (this)
    (str
     "{"
-    (let loop ((pairs (entries this))
+    (let loop ((pairs (map-entries this))
                (acc ""))
       (if (null? pairs)
           acc
