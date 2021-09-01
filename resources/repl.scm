@@ -11,11 +11,10 @@
     scheme-exp))
 
 (define (rudra-read rudra-code)
-  (let* ((_ (system (str "lein -compile-exp '" rudra-code "' >/dev/null 2>&1")))
-         (port (open-input-file ".rudra-repl"))
-         (scheme-code (get-string-all port)))
-    (close-input-port port)
-    (system "rm .rudra-repl >/dev/null 2>&1")
+  (let* ((_ (spit-file! ".rudra-repl-in.rudra" rudra-code))
+         (_ (system (str "lein -compile-exp .rudra-repl-in.rudra .rudra-repl-out.scm >/dev/null 2>&1")))
+         (scheme-code (slurp-file ".rudra-repl-out.scm")))
+    (delete-file! ".rudra-repl-out.scm")
     (read-string scheme-code)))
 
 (define (rudra-eval rudra-code)

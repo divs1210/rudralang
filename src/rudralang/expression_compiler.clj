@@ -4,9 +4,9 @@
             [rudralang.parser :as parser]))
 
 (defn -main
-  [exp-str]
-  (spit ".rudra-repl"
+  [in-file out-file]
+  (spit out-file
         (try
-          (compiler/compile (parser/parse exp-str))
+          (compiler/compile (parser/parse (slurp in-file)))
           (catch Throwable e
             (str "(println! " (pr-str (.getMessage e)) ")")))))
