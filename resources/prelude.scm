@@ -37,14 +37,14 @@
     String)
    ((fn? x)
     Fn)
-   ((atom? x)
-    Atom)
    ((map? x)
     Map)
    ((list? x)
     List)
    ((pair? x)
     Pair)
+   ((atom? x)
+    Atom)
    (else
     <unknown>)))
 
