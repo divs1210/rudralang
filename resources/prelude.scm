@@ -485,7 +485,7 @@
              (lambda (ts)
                (cons type ts))))))
 
-(define (implementation protocol method type)
+(define (implementation* protocol method type)
   (let ((impl (get-in (deref (get protocol 'implementations))
                        (list method type))))
     (cond
@@ -498,9 +498,14 @@
                (name (get protocol 'name))
                " defined.")))
      ((null? impl)
-      (implementation protocol method '<default>))
+      (implementation* protocol method '<default>))
      (else
       impl))))
+
+(define-syntax implementation
+  (syntax-rules ()
+    ((_ protocol method-name type)
+     (implementation* protocol (quote method-name) type))))
 
 (define (add-implementation! protocol method type fn)
   (swap! (get protocol 'implementations)
@@ -508,7 +513,7 @@
 
 (define (method* protocol method-name)
   (lambda args
-    (let* ((f (implementation protocol method-name (type (first args)))))
+    (let* ((f (implementation* protocol method-name (type (first args)))))
       (apply f args))))
 
 (define-syntax method
@@ -609,7 +614,7 @@
  (lambda (this)
    (str
     "{"
-    (let loop ((pairs (->list this))
+    (let loop ((pairs (entries this))
                (acc ""))
       (if (null? pairs)
           acc
@@ -650,9 +655,8 @@
 (implement-method!
  IRudra ->string <default>
  (lambda (obj)
-   (if (and (map? obj)
-            (contains? obj '<type>))
-       (let ((impl (implementation IRudra '->string Map)))
+   (if (map? obj)
+       (let ((impl (implementation IRudra ->string Map)))
          (impl obj))
        "<unknown>")))
 
