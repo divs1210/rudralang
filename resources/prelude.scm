@@ -81,7 +81,7 @@
 ;; ## Boolean
 ;; ==========
 (define (falsey? x)
-  (or (not x)
+  (or (scheme-equal? #f x)
       (null? x)))
 
 (define (truthy? x)
