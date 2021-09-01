@@ -345,18 +345,9 @@
   (apply update-in m (list k) f args))
 
 (define (dissoc m k)
-  (let loop ((new-m '())
-             (remaining-pairs m))
-    (if (null? remaining-pairs)
-        new-m
-        (let* ((cell (car remaining-pairs))
-               (cell-k (car cell))
-               (cell-v (cdr cell)))
-          (if (equal? k cell-k)
-              (loop new-m
-                    (cdr remaining-pairs))
-              (loop (assoc* new-m cell-k cell-v)
-                    (cdr remaining-pairs)))))))
+  (remove-first (lambda (entry)
+                  (equal? k (car entry)))
+                m))
 
 (define (contains? m k)
   (let loop ((ks (keys m)))
