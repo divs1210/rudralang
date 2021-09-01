@@ -239,12 +239,29 @@
             #t
             (list-contains? (cdr xs) x)))))
 
+(define (reduced x)
+  (pair '<reduced> x))
+
+(define (reduced? x)
+  (and (pair? x)
+       (scheme-equal? '<reduced> (car x))))
+
 (define (reduce f init coll)
   (if (null? coll)
       init
-      (reduce f
-              (f init (car coll))
-              (cdr coll))))
+      (let ((acc (f init (car coll))))
+        (if (reduced? acc)
+            (cdr acc)
+            (reduce f acc (cdr coll))))))
+
+(define (remove-first pred xs)
+  (reverse
+   (reduce (lambda (acc x)
+             (if (pred x)
+                 acc
+                 (cons x acc)))
+           null
+           xs)))
 
 (define (range start end step)
   (let ((compare (if (positive? step) < >))
@@ -288,6 +305,11 @@
 (define (vals m)
   (map cdr (dissoc m '<map>)))
 
+(define (entries m)
+  (remove-first (lambda (x)
+                  (equal? map-type-tag x))
+                m))
+
 (define (get m k)
   (let ((pair (find-first (lambda (pair)
                             (equal? k (first pair)))
@@ -301,7 +323,9 @@
               (cdr ks))))
 
 (define (assoc* m k v)
-  (cons (cons k v) m))
+  (if (null? m)
+      (assoc* (list-map) k v)
+      (cons (pair k v) m)))
 
 (define (assoc m k v)
   (assoc* (dissoc m k)
@@ -312,9 +336,7 @@
         (ks (cdr ks)))
     (if (null? ks)
         (assoc m k v)
-        (assoc m k (assoc-in (get m k)
-                             ks
-                             v)))))
+        (assoc m k (assoc-in (get m k) ks v)))))
 
 (define (update-in m ks f . args)
   (assoc-in m ks (apply f (get-in m ks) args)))
@@ -537,8 +559,7 @@
 
 (implement-method!
  IRudra ->list Map
- (lambda (m)
-   (dissoc m '<map>)))
+ entries)
 
 (implement-method!
  IRudra ->list String
