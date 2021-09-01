@@ -422,6 +422,22 @@
 ;; ============
 (define fn? procedure?)
 
+;; ## Files
+;; ========
+(define (delete-file! fname)
+  (system (str "rm " fname " >/dev/null 2>&1")))
+
+(define (slurp-file fname)
+  (let* ((port (open-input-file fname))
+         (text (get-string-all port)))
+    (close-input-port port)
+    text))
+
+(define (spit-file! fname text)
+  (delete-file! fname)
+  (let* ((port (open-output-file fname)))
+    (display text port)
+    (close-output-port port)))
 
 ;; ## Types and Protocols
 ;; ======================
