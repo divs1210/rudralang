@@ -269,6 +269,10 @@
   (let* ((n (length tail)))
     (scheme-equal? tail (take-last n xs))))
 
+(define (repeat n x)
+  (map (lambda (_) x)
+       (range 0 n 1)))
+
 ;; ## Maps
 ;; =======
 (define (pair x y)
@@ -392,6 +396,42 @@
 (define (println! . args)
   (apply print! args)
   (newline))
+
+(define (pprint!* x indent-n)
+  (let ((indentation (apply str (repeat indent-n " "))))
+    (cond
+     ((map? x)
+      (begin
+        (print! indentation)
+        (println! "{")
+        (let ((indent-n (+ 2 indent-n)))
+          (for-each (lambda (pair)
+                      (pprint!* (car pair) indent-n)
+                      (println!)
+                      (pprint!* (cdr pair) indent-n)
+                      (println! ",\n"))
+                    (map-entries x)))
+        (print! indentation "}")))
+     ((list? x)
+      (begin
+        (print! indentation)
+        (println! "[")
+        (let ((indent-n (+ 2 indent-n)))
+          (for-each (lambda (e)
+                      (pprint!* e indent-n)
+                      (println! ","))
+                    x))
+        (print! indentation "]")))
+     ((atom? x)
+      (println! indentation "<Atom(")
+      (pprint!* (deref x) (+ 2 indent-n))
+      (print! "\n" indentation ")>"))
+     (else
+      (print! indentation x)))))
+
+(define (pprint! x)
+  (pprint!* x 0)
+  (println!))
 
 ;; ## Math
 ;; =======
