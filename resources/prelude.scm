@@ -602,6 +602,14 @@
  (lambda (this)
    (list (car this) (cdr this))))
 
+(implement-method!
+ IRudra ->list <default>
+ (lambda (obj)
+   (if (map? obj)
+       (let ((impl (implementation IRudra ->list Map)))
+         (impl obj))
+       (raise! (str "->list not implemented for type: " (type obj))))))
+
 (define ->list
   (method IRudra ->list))
 
@@ -650,7 +658,7 @@
  (lambda (this)
    (str
     "{"
-    (let loop ((pairs (map-entries this))
+    (let loop ((pairs (->list this))
                (acc ""))
       (if (null? pairs)
           acc
