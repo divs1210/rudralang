@@ -48,7 +48,7 @@
     (let* ((in (read-lines))
            (res (rudra-eval in)))
       (when (not (same? (void) res))
-        (println! res))))
+        (pprint! res))))
   (rudra-repl))
 
 (rudra-repl)
