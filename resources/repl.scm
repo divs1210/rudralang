@@ -11,6 +11,7 @@
     scheme-exp))
 
 (define (rudra-read rudra-code)
+  (println! "compiling...")
   (let* ((_ (spit-file! ".rudra-repl-in.rudra" rudra-code))
          (_ (system (str "lein -compile-exp .rudra-repl-in.rudra .rudra-repl-out.scm >/dev/null 2>&1")))
          (scheme-code (slurp-file ".rudra-repl-out.scm")))
@@ -18,7 +19,9 @@
     (read-string scheme-code)))
 
 (define (rudra-eval rudra-code)
-  (eval (rudra-read rudra-code)))
+  (let ((scheme-exp (rudra-read rudra-code)))
+    (println! "evaluating...")
+    (eval scheme-exp)))
 
 ;; read text from stdin up till newline
 (define (read-line)
@@ -43,7 +46,6 @@
               (display-condition ex)
               (newline)))
     (let* ((in (read-lines))
-           (_ (println! "evaluating..."))
            (res (rudra-eval in)))
       (when (not (same? (void) res))
         (println! res))))
