@@ -97,6 +97,7 @@
        (same? x y))
       (Map
        (and
+        (map? y)
         (scheme-equal? (length x) (length y))
         (every? (lambda (pair)
                   (let ((k (car pair))
@@ -107,21 +108,24 @@
                      #t)))
                 x)))
       (List
-       (let loop ((xs x)
-                  (ys y))
-         (cond
-          ((and (null? xs) (null? ys))
-           #t)
-          ((or (null? xs) (null? ys))
-           #f)
-          (else
-           (if (equal? (first xs)
-                       (first ys))
-               (loop (rest xs)
-                     (rest ys))
-               #f)))))
+       (and
+        (list? y)
+        (let loop ((xs x)
+                   (ys y))
+          (cond
+           ((and (null? xs) (null? ys))
+            #t)
+           ((or (null? xs) (null? ys))
+            #f)
+           (else
+            (if (equal? (first xs)
+                        (first ys))
+                (loop (rest xs)
+                      (rest ys))
+                #f))))))
       (Pair
        (and
+        (pair? y)
         (equal? (car x) (car y))
         (equal? (cdr x) (cdr y))))
       (else
