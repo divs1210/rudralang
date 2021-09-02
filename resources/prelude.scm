@@ -254,15 +254,6 @@
             (cdr acc)
             (reduce f acc (cdr coll))))))
 
-(define (remove-first pred xs)
-  (reverse
-   (reduce (lambda (acc x)
-             (if (pred x)
-                 acc
-                 (cons x acc)))
-           null
-           xs)))
-
 (define (range start end step)
   (let ((compare (if (positive? step) < >))
         (update  (lambda (x) (+ x step))))
@@ -306,9 +297,9 @@
   (map cdr (dissoc m '<map>)))
 
 (define (map-entries m)
-  (remove-first (lambda (x)
-                  (equal? map-type-tag x))
-                m))
+  (filter (lambda (x)
+            (not (equal? map-type-tag x)))
+          m))
 
 (define (get m k)
   (let ((pair (find-first (lambda (pair)
@@ -345,9 +336,9 @@
   (apply update-in m (list k) f args))
 
 (define (dissoc m k)
-  (remove-first (lambda (entry)
-                  (equal? k (car entry)))
-                m))
+  (filter (lambda (entry)
+            (not (equal? k (car entry))))
+          m))
 
 (define (contains? m k)
   (let loop ((ks (keys m)))
