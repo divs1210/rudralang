@@ -531,7 +531,8 @@
      (begin
        (add-method! protocol (quote method))
        (add-implementor! protocol (quote method) _type)
-       (add-implementation! protocol (quote method) _type fn)))))
+       (add-implementation! protocol (quote method) _type fn)
+       (void)))))
 
 
 ;; Rudra core methods
