@@ -608,11 +608,11 @@
 
 (implement-method!
  IRudra ->list <default>
- (lambda (obj)
-   (if (map? obj)
-       (let ((impl (implementation IRudra ->list Map)))
-         (impl obj))
-       (raise! (str "->list not implemented for type: " (type obj))))))
+ (let ((map->list (implementation IRudra ->list Map)))
+   (lambda (obj)
+     (if (map? obj)
+         (map->list obj)
+         (raise! (str "->list not implemented for type: " (type obj)))))))
 
 (define ->list
   (method IRudra ->list))
