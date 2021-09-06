@@ -65,6 +65,9 @@
              (acc (apply f args)))
         ((apply comp (drop-last 1 fs)) acc))))))
 
+(define (void? x)
+  (eq? (void) x))
+
 ;; ## Constants
 ;; ============
 (define null
@@ -82,7 +85,8 @@
 ;; ==========
 (define (falsey? x)
   (or (scheme-equal? #f x)
-      (null? x)))
+      (null? x)
+      (void? x)))
 
 (define (truthy? x)
   (not (falsey? x)))
