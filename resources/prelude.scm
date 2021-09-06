@@ -522,7 +522,7 @@
 
 (define (implementation* protocol method type)
   (let ((impl (get-in (deref (get protocol 'implementations))
-                       (list method type))))
+                      (list method type))))
     (cond
      ((and (null? impl)
            (scheme-equal? '<default> type))
