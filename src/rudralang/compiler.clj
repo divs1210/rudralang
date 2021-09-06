@@ -33,7 +33,7 @@
           rest-rhs (when (some? rest-name)
                      (list 'drop (count lhs-ks) rhs-name))]
       (list*
-       (list rhs-name (compile [:form [:symbol '->list] rhs]))
+       (list rhs-name (compile rhs))
        (apply
         concat
         (when (some? rest-name)
