@@ -614,7 +614,7 @@
  (let ((map->list (implementation IRudra ->list Map)))
    (lambda (obj)
      (if (map? obj)
-         (map->list obj)
+         (map->list (dissoc obj '<type>))
          (raise! (str "->list not implemented for type: " (type obj)))))))
 
 (define ->list
