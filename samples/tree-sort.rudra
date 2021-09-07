@@ -7,7 +7,7 @@ ns!(tree-sort,
         {:val x
          :ltree {}
          :rtree {}}
-      lt(x, get(tree, :val)) =>
+      lt(x, map-get(tree, :val)) =>
         update(tree, :ltree, place, x)
       :else =>
         update(tree, :rtree, place, x)
@@ -33,9 +33,9 @@ ns!(tree-sort,
         null
       :else =>
         append(
-          walk(get(tree, :ltree)),
-          list(get(tree, :val)),
-          walk(get(tree, :rtree))
+          walk(map-get(tree, :ltree)),
+          list(map-get(tree, :val)),
+          walk(map-get(tree, :rtree))
         )
     )
 

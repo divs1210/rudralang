@@ -108,7 +108,7 @@
                         (v (cdr pair)))
                     (and
                      (contains? y k)
-                     (equal? v (get y k))
+                     (equal? v (map-get y k))
                      #t)))
                 x)))
       (List
@@ -319,17 +319,17 @@
 (define (map-empty? m)
   (null? (map-entries m)))
 
-(define (get m k)
+(define (map-get m k)
   (let ((pair (find-first (lambda (pair)
                             (equal? k (first pair)))
                           m)))
     (rest pair)))
 
-(define (get-in m ks)
+(define (map-get-in m ks)
   (if (null? ks)
       m
-      (get-in (get m (car ks))
-              (cdr ks))))
+      (map-get-in (map-get m (car ks))
+                  (cdr ks))))
 
 (define (assoc* m k v)
   (if (null? m)
@@ -345,10 +345,10 @@
         (ks (cdr ks)))
     (if (null? ks)
         (assoc m k v)
-        (assoc m k (assoc-in (get m k) ks v)))))
+        (assoc m k (assoc-in (map-get m k) ks v)))))
 
 (define (update-in m ks f . args)
-  (assoc-in m ks (apply f (get-in m ks) args)))
+  (assoc-in m ks (apply f (map-get-in m ks) args)))
 
 (define (update m k f . args)
   (apply update-in m (list k) f args))
@@ -500,26 +500,26 @@
   (let ((t (type* x)))
     (if (and (scheme-equal? Map t)
              (contains? x '<type>))
-        (get x '<type>)
+        (map-get x '<type>)
         t)))
 
 (define (methods protocol)
-  (deref (get protocol 'methods)))
+  (deref (map-get protocol 'methods)))
 
 (define (add-method! protocol method)
-  (let ((methods-atom (get protocol 'methods)))
+  (let ((methods-atom (map-get protocol 'methods)))
     (when (not (list-contains? (deref methods-atom)
                                method))
-        (swap! methods-atom
-               (lambda (ms)
-                 (cons method ms))))))
+      (swap! methods-atom
+             (lambda (ms)
+               (cons method ms))))))
 
 (define (implementors protocol method)
-  (get (deref (get protocol 'implementors))
-       method))
+  (map-get (deref (map-get protocol 'implementors))
+           method))
 
 (define (add-implementor! protocol method type)
-  (let* ((implementors-atom (get protocol 'implementors))
+  (let* ((implementors-atom (map-get protocol 'implementors))
          (implementors-of-method (implementors protocol method)))
     (when (not (list-contains? implementors-of-method type))
       (swap! implementors-atom
@@ -528,8 +528,8 @@
                (cons type ts))))))
 
 (define (implementation* protocol method type)
-  (let ((impl (get-in (deref (get protocol 'implementations))
-                      (list method type))))
+  (let ((impl (map-get-in (deref (map-get protocol 'implementations))
+                          (list method type))))
     (cond
      ((and (null? impl)
            (scheme-equal? '<default> type))
@@ -537,7 +537,7 @@
                "No default method "
                (name method)
                " of protocol "
-               (name (get protocol 'name))
+               (name (map-get protocol 'name))
                " defined.")))
      ((null? impl)
       (implementation* protocol method '<default>))
@@ -550,7 +550,7 @@
      (implementation* protocol (quote method-name) type))))
 
 (define (add-implementation! protocol method type fn)
-  (swap! (get protocol 'implementations)
+  (swap! (map-get protocol 'implementations)
          assoc-in (list method type) fn))
 
 (define (method* protocol method-name)

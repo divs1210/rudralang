@@ -74,7 +74,7 @@
        (list (list rhs-name (compile rhs)))
        (map (fn [k]
               (let [k-sym (compile k)]
-                (list k-sym (list 'get rhs-name (symbol (str "':" k-sym))))))
+                (list k-sym (list 'map-get rhs-name (symbol (str "':" k-sym))))))
             lhs-ks)
        default-bindings))))
 
