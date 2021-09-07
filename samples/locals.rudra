@@ -2,6 +2,6 @@ defn!(main!, {}, _ =>
   let [m, n] := [1, 2]
   println!("m, n = " m ", " n)
 
-  let twice := fn([x] => (x * 2))
+  let twice := fn([x] => mul(x, 2))
   println!("twice(n) = " twice(n))
 )

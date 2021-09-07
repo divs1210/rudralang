@@ -15,7 +15,7 @@ ns!(fizzbuzz,
 
     for-each(
       fn([x] => println!(fizzbuzz(x))),
-      range(1, (n + 1), 1)
+      range(1, inc(n), 1)
     )
   )
 )

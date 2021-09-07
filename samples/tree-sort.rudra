@@ -3,11 +3,11 @@ ns!(tree-sort,
 
   letfn place := [tree, x] =>
     cond(
-      null?(tree) =>
+      map-empty?(tree) =>
         {:val x
          :ltree {}
          :rtree {}}
-      (x < get(tree, :val)) =>
+      lt(x, get(tree, :val)) =>
         update(tree, :ltree, place, x)
       :else =>
         update(tree, :rtree, place, x)
@@ -29,7 +29,7 @@ ns!(tree-sort,
 
   letfn walk := [tree] =>
     cond(
-      null?(tree) =>
+      map-empty?(tree) =>
         null
       :else =>
         append(

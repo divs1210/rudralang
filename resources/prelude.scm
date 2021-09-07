@@ -316,6 +316,9 @@
                  (not (equal? map-type-tag x)))
                m)))
 
+(define (map-empty? m)
+  (null? (map-entries m)))
+
 (define (get m k)
   (let ((pair (find-first (lambda (pair)
                             (equal? k (first pair)))
@@ -450,20 +453,17 @@
 
 (define sub -)
 
+(define (inc x)
+  (+ x 1))
+
+(define (dec x)
+  (- x 1))
+
 (define mul *)
 
 (define div /)
 
 (define pow expt)
-
-(define % mod)
-
-(define ** pow)
-
-(define (== x y)
-  (if (number? x)
-      (scheme-equal? x y)
-      (raise! (str "non-number " x " passed to =="))))
 
 (define lt <)
 

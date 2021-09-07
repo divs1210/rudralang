@@ -20,17 +20,12 @@
        (map last)
        str/join))
 
-(defn transform-infix-operation
-  [x-node op y-node]
-  [:form op x-node y-node])
-
 (def transform-options
   {:exp     identity
    :number  (tag :number read-string)
    :keyword (tag :keyword keyword)
    :symbol  (tag :symbol symbol)
-   :string  (tag :string transform-string)
-   :infix_operation transform-infix-operation})
+   :string  (tag :string transform-string)})
 
 (defn parse
   [text]
