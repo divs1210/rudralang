@@ -196,7 +196,7 @@
       null
       (cdr xs)))
 
-(define nth list-ref)
+(define list-get list-ref)
 
 (define (last xs)
   (cond

@@ -42,7 +42,7 @@
                        (destructuring-bind
                         k
                         [:form
-                         [:symbol 'nth]
+                         [:symbol 'list-get]
                          [:symbol rhs-name]
                          [:number idx]]))
                      lhs-ks))))
