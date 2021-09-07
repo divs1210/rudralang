@@ -1,9 +1,10 @@
 (import (rename (scheme)
-                (assoc scheme-assoc)
-                (merge scheme-merge)
-                (div   scheme-div)
+                (assoc  scheme-assoc)
+                (merge  scheme-merge)
+                (div    scheme-div)
+                (eq?    scheme-eq?)
                 (equal? scheme-equal?)
-                (atom? scheme-atom?)))
+                (atom?  scheme-atom?)))
 
 ;; ## Internal
 ;; ==========
@@ -66,7 +67,7 @@
         ((apply comp (drop-last 1 fs)) acc))))))
 
 (define (void? x)
-  (eq? (void) x))
+  (scheme-eq? (void) x))
 
 ;; ## Constants
 ;; ============
@@ -92,7 +93,7 @@
   (not (falsey? x)))
 
 (define (same? x y)
-  (eq? x y))
+  (scheme-eq? x y))
 
 (define (equal? x y)
   (let ((t (type* x)))
@@ -465,13 +466,15 @@
 
 (define pow expt)
 
-(define lt <)
+(define eq? scheme-equal?)
 
-(define gt >)
+(define lt? <)
 
-(define lte <=)
+(define gt? >)
 
-(define gte >=)
+(define lte? <=)
+
+(define gte? >=)
 
 ;; ## Functions
 ;; ============

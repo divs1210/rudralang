@@ -7,7 +7,7 @@ ns!(tree-sort,
         {:val x
          :ltree {}
          :rtree {}}
-      lt(x, map-get(tree, :val)) =>
+      lt?(x, map-get(tree, :val)) =>
         update(tree, :ltree, place, x)
       :else =>
         update(tree, :rtree, place, x)
