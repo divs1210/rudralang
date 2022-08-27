@@ -10,12 +10,12 @@ Check out the [sample programs](samples/).
 
 ## Goals
 
+- **Ergonomic** familiar syntax, destructuring everywhere
 - **Extensible** top-level functions are polymorphic by default
-- **Recursion-friendly** many algorithms are simpler when defined recursively - they should be written as such
+- **Immutable data structures** by default
 - **Concurrency-friendly** mutability using Clojure-like [`atom`s](https://clojuredocs.org/clojure.core/atom)
 - **Full numeric tower** example: no integer overflows, `pow(-1, 0.5)` is `0+i`
-- **Ergonomic** familiar syntax, destructuring everywhere
-- **Immutable data structures** by default
+- **Recursion-friendly** many algorithms are simpler when defined recursively - they should be written as such
 
 ## Notes on this implementation
 
