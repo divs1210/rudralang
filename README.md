@@ -2,7 +2,7 @@
 
 # rudralang
 
-A dynamic general-purpose high-level functional-programming language with familiar syntax.
+A dynamic general-purpose high-level functional-programming language with familiar syntax that compiles to native binaries.
 
 ## Code Examples
 
