@@ -6,7 +6,27 @@ A dynamic general-purpose high-level functional-programming language with famili
 
 ## Code Examples
 
-Check out the [sample programs](samples/).
+Implementation of the [Ackermann function](https://en.wikipedia.org/wiki/Ackermann_function):
+
+```elixir
+ns!(ackermann,
+  {} =>
+
+  letfn A := [m, n] =>
+    cond(
+      zero?(m) => inc(n)
+      zero?(n) => A(dec(m), 1)
+      :else    => A(dec(m), A(m, dec(n)))
+    )
+
+  defn!(main!, {}, [_, m, n] =>
+    let [m, n] := map(string->number, [m, n])
+    println!("A(" m ", " n ") = " A(m, n))
+  )
+)
+```
+
+Check out other [sample programs](samples/).
 
 ## Goals
 
